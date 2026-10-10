@@ -1,9 +1,9 @@
-package fa.training.backend_qlct.service;
+package com.expensemanagement.backend.service;
 
-import fa.training.backend_qlct.dto.request.UserCreationRequest;
-import fa.training.backend_qlct.dto.request.UserUpdateRequest;
-import fa.training.backend_qlct.entities.Users;
-import fa.training.backend_qlct.respository.UserRepository;
+import com.expensemanagement.backend.DTO.request.UserCreationRequest;
+import com.expensemanagement.backend.DTO.request.UserUpdateRequest;
+import com.expensemanagement.backend.entity.User;
+import com.expensemanagement.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +15,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     
-    public Users createRequest(UserCreationRequest request){
-       Users users = new Users();
+    public User createRequest(UserCreationRequest request){
+       User users = new User();
        users.setUsername(request.getUsername());
        users.setPassword(request.getPassword());
        users.setFirstname(request.getFirstname());
@@ -26,16 +26,16 @@ public class UserService {
        return userRepository.save(users);
     }
 
-    public List<Users> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Users getUser(Long id){
+    public User getUser(Long id){
        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
-    public Users updateRequest(Long userID,UserUpdateRequest request){
-        Users users = getUser(userID);
+    public User updateRequest(Long userID, UserUpdateRequest request){
+        User users = getUser(userID);
         users.setFirstname(request.getFirstname());
         users.setLastname(request.getLastname());
         users.setDob(request.getDob());
@@ -49,7 +49,7 @@ public class UserService {
     }
 
     // Tim user theo username va password (su dung query thong qua Spring Data JPA cho toi uu)
-    public Users findByUsername(String username) {
+    public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
     

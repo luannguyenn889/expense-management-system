@@ -1,13 +1,15 @@
-package fa.training.backend_qlct.controller;
+package com.expensemanagement.backend.controller;
 
-import fa.training.backend_qlct.dto.request.UserCreationRequest;
-import fa.training.backend_qlct.dto.request.UserUpdateRequest;
-import fa.training.backend_qlct.entities.Users;
-import fa.training.backend_qlct.service.UserService;
+
+import com.expensemanagement.backend.DTO.request.UserCreationRequest;
+import com.expensemanagement.backend.DTO.request.UserUpdateRequest;
+import com.expensemanagement.backend.entity.User;
+import com.expensemanagement.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 // Controller la lop chua cac endpoint,
 // nhan request tu client, goi service de xu ly va tra ve response cho client
 @RestController
@@ -18,22 +20,22 @@ public class UserControllers {
     private UserService userService;
 
     @PostMapping
-    public Users createUser(@RequestBody UserCreationRequest request) {
+    public User createUser(@RequestBody UserCreationRequest request) {
         return userService.createRequest(request);
     }
 
     @GetMapping
-    public List<Users> getAllUsers() {
+    public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{userId}")
-    public Users users(@PathVariable("userId") Long userId){
+    public User users(@PathVariable("userId") Long userId){
         return userService.getUser(userId);
     }
     
     @PutMapping("/{userId}")
-    public Users updateRequest(@PathVariable("userId") Long userId, @RequestBody UserUpdateRequest request) {
+    public User updateRequest(@PathVariable("userId") Long userId, @RequestBody UserUpdateRequest request) {
          return userService.updateRequest(userId, request);
     }
 

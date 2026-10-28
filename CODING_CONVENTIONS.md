@@ -1,6 +1,6 @@
 # CODING CONVENTIONS — HỆ THỐNG QUẢN LÝ CHI TIÊU
 
-Tài liệu quy định toàn bộ tiêu chuẩn lập trình, đặt tên, cấu trúc dự án và quy tắc kiểm thử cho Hệ thống Quản lý Chi tiêu Cá nhân (gồm 6 Epic), áp dụng thống nhất cho CSDL, Backend (Java Spring Boot), Frontend (React/TypeScript), Git, REST API và Kiểm thử phần mềm (Testing).
+Tài liệu quy định toàn bộ tiêu chuẩn lập trình, đặt tên, cấu trúc dự án và quy tắc kiểm thử cho Hệ thống Quản lý Chi tiêu Cá nhân (gồm 6 Epic), áp dụng thống nhất cho CSDL, Backend (Java Spring Boot), Frontend (Angular/TypeScript), Git, REST API và Kiểm thử phần mềm (Testing).
 
 ---
 
@@ -124,17 +124,70 @@ Khi có lỗi:
 
 ---
 
-## 4. QUY ƯỚC FRONTEND (REACT / TYPESCRIPT)
+## 4. QUY ƯỚC FRONTEND (ANGULAR / TYPESCRIPT)
 
-- **Component & Tệp Component:** `PascalCase`
-  - Ví dụ: `WalletList.tsx`, `TransactionModal.tsx`, `DashboardCard.tsx`
-- **Hook tùy chỉnh:** `camelCase`, tiền tố `use`
-  - Ví dụ: `useWallets.ts`, `useAuth.ts`, `useTransactions.ts`
-- **Service API & Helper:** `camelCase`
-  - Ví dụ: `walletService.ts`, `formatCurrency.ts`, `dateFormatter.ts`
-- **Interface & Type:** `PascalCase`
-  - Ví dụ: `Wallet`, `Transaction`, `User`, `BudgetReport`
-- **CSS Module / Styling:** `PascalCase.module.css` hoặc `kebab-case.css`
+- **Phiên bản:** Angular 21 (Standalone Components, Signals), TypeScript 5.9, Angular CLI (`@angular/build`).
+- **Định dạng code:** Prettier theo cấu hình trong `frontend/package.json` (`printWidth: 100`, `singleQuote: true`) và `frontend/.editorconfig`.
+- Luôn tạo file bằng Angular CLI (`ng generate ...`) để đúng cấu trúc và tên.
+
+### 4.1. Cấu trúc thư mục
+```
+frontend/src/app
+├── core                 # Thành phần dùng chung toàn ứng dụng, khởi tạo một lần
+│   ├── models           # Interface/Type: user.model.ts, wallet.model.ts, api-response.model.ts
+│   ├── services         # Service gọi API: auth.service.ts, wallet.service.ts
+│   ├── interceptors     # auth.interceptor.ts, error.interceptor.ts
+│   └── guards           # auth.guard.ts, guest.guard.ts
+├── features             # Mỗi Epic/chức năng một thư mục
+│   ├── auth
+│   │   ├── login        # login.ts, login.html, login.css, login.spec.ts
+│   │   └── register
+│   └── wallet
+│       ├── wallet-list
+│       └── wallet-create-form
+├── shared               # Component/Pipe/Directive tái sử dụng
+│   ├── components
+│   └── pipes            # currency-vnd.pipe.ts
+├── app.ts / app.html / app.css
+├── app.config.ts        # provideRouter, provideHttpClient(withInterceptors([...]))
+└── app.routes.ts        # Khai báo route, lazy load bằng loadComponent
+```
+- Đường dẫn API gốc đặt trong `src/environments/environment.ts` (`apiUrl: 'http://localhost:8080/api/v1'`), **không hard-code** trong service.
+
+### 4.2. Quy tắc đặt tên
+
+| Thành phần | Tên file (`kebab-case`) | Tên lớp / hàm / hằng | Ví dụ |
+| :--- | :--- | :--- | :--- |
+| **Component** | `{tên}.ts`, `{tên}.html`, `{tên}.css` (theo style guide Angular 20+, không hậu tố `.component`) | `PascalCase`, không hậu tố | `wallet-list.ts` → `WalletList` |
+| **Selector Component** | — | `kebab-case`, tiền tố `app-` | `app-wallet-list`, `app-login` |
+| **Service** | `{tên}.service.ts` | `{Tên}Service` | `wallet.service.ts` → `WalletService` |
+| **Interface / Type (Model)** | `{tên}.model.ts` | `PascalCase`, không tiền tố `I` | `wallet.model.ts` → `Wallet`, `WalletCreateRequest` |
+| **Guard (functional)** | `{tên}.guard.ts` | `camelCase` + `Guard` | `auth.guard.ts` → `authGuard` |
+| **Interceptor (functional)** | `{tên}.interceptor.ts` | `camelCase` + `Interceptor` | `auth.interceptor.ts` → `authInterceptor` |
+| **Pipe** | `{tên}.pipe.ts` | `{Tên}Pipe`, tên pipe `camelCase` | `currency-vnd.pipe.ts` → `CurrencyVndPipe` (`currencyVnd`) |
+| **Directive** | `{tên}.directive.ts` | `{Tên}Directive`, selector `[appTên]` | `autofocus.directive.ts` → `[appAutofocus]` |
+| **Hằng số** | `{tên}.constants.ts` | `UPPER_SNAKE_CASE` | `TOKEN_STORAGE_KEY`, `MAX_WALLET_NAME_LENGTH` |
+| **Thư mục** | `kebab-case` | — | `wallet-create-form`, `auth` |
+
+- **Thuộc tính & biến:** `camelCase` (`walletName`, `isLoading`, `totalBalance`).
+- **Observable:** hậu tố `$` (`wallets$`, `currentUser$`).
+- **Signal:** danh từ, không hậu tố (`wallets = signal<Wallet[]>([])`, `isLoading = signal(false)`); giá trị dẫn xuất dùng `computed` (`totalBalance = computed(...)`).
+- **Phương thức xử lý sự kiện:** tiền tố `on` (`onSubmit()`, `onLogout()`); phương thức service dùng động từ giống Backend (`getWallets()`, `createWallet()`, `login()`, `register()`).
+- **Tên field trong Model** phải khớp JSON của API (`walletId`, `walletName`, `balance`, `isActive`).
+
+### 4.3. Quy tắc viết code
+- **Chỉ dùng Standalone Component**, không tạo `NgModule`. Khai báo phụ thuộc trong `imports` của `@Component`.
+- Dùng `inject()` thay cho constructor injection: `private readonly walletService = inject(WalletService);`.
+- Dùng `input()`, `output()`, `signal()`, `computed()` thay cho `@Input`/`@Output` decorator ở code mới.
+- Template dùng control flow mới: `@if`, `@for (... ; track item.walletId)`, `@empty`; không dùng `*ngIf`, `*ngFor`.
+- Đặt `changeDetection: ChangeDetectionStrategy.OnPush` cho component.
+- Form dùng **Reactive Forms** (`FormBuilder`, `Validators`), không dùng template-driven form cho chức năng nghiệp vụ.
+- Gọi HTTP **chỉ trong Service** (`HttpClient`), Component không gọi `HttpClient` trực tiếp. Service trả về `Observable<T>` đã bóc `data` từ `ApiResponse<T>`.
+- Gắn token qua `authInterceptor`; xử lý `401` (xóa token, chuyển về `/login`) tập trung trong interceptor.
+- Bảo vệ route bằng `canActivate: [authGuard]`; route nghiệp vụ lazy load bằng `loadComponent`.
+- Hủy subscription bằng `takeUntilDestroyed()` hoặc dùng `async` pipe / `toSignal()`; không để rò rỉ subscription.
+- Không dùng kiểu `any`; bật và tuân thủ `strict` trong `tsconfig.json`.
+- **Styling:** CSS riêng cho từng component (`{tên}.css`); style toàn cục chỉ đặt trong `src/styles.css`. Tên class CSS dùng `kebab-case`.
 
 ---
 
@@ -147,9 +200,12 @@ Quy định chuẩn mực kiểm thử cho cả Backend và Frontend, đảm b�
   - **Framework chính:** JUnit 5 (Jupiter), AssertJ, Mockito.
   - **Unit Test:** Kiểm thử độc lập từng tầng logic (Service, Helper, Utility) sử dụng Mockito để mock phụ thuộc.
   - **Integration Test:** Kiểm thử tích hợp luồng Controller -> Service -> DB bằng `@SpringBootTest`, `@AutoConfigureMockMvc`, hoặc `@DataJpaTest` (với H2 Database / Testcontainers).
-- **Frontend (React / TypeScript):**
-  - **Công cụ:** Jest / Vitest + React Testing Library.
-  - Kiểm thử render Component, tương tác người dùng (click, input) và mock API calls.
+- **Frontend (Angular / TypeScript):**
+  - **Công cụ:** Vitest (chạy qua builder `@angular/build:unit-test`, lệnh `ng test` / `npm run test`) + Angular `TestBed`, môi trường `jsdom`.
+  - **Component Test:** kiểm thử render, tương tác người dùng (nhập form, click) qua `fixture.nativeElement` / `DebugElement`, gọi `fixture.detectChanges()` hoặc `await fixture.whenStable()` sau mỗi thay đổi.
+  - **Service Test:** mock HTTP bằng `provideHttpClient()` + `provideHttpClientTesting()` và `HttpTestingController` (`expectOne`, `flush`, `verify`).
+  - Khi test Component, mock Service bằng `{ provide: WalletService, useValue: { getWallets: vi.fn() } }`; không gọi API thật trong Unit Test.
+  - Test Guard/Interceptor bằng `TestBed.runInInjectionContext(...)`.
 
 ### 5.2. Cấu trúc thư mục Test
 Thư mục test phải phản chiếu chính xác cấu trúc gói của mã nguồn chính (`src/main` -> `src/test`):
@@ -170,7 +226,7 @@ backend/src/test/java/com/expensemanagement/backend
 Tên lớp test phải kết thúc bằng hậu tố `Test` (đối với Unit Test) hoặc `IntegrationTest` / `IT` (đối với Integration Test):
 - Unit Test: `{TargetClass}Test` (ví dụ: `UserServiceTest`, `WalletServiceTest`).
 - Integration Test: `{TargetModule}IntegrationTest` hoặc `{TargetClass}IT` (ví dụ: `WalletIntegrationTest`).
-- Frontend Component Test: `{ComponentName}.test.tsx` (ví dụ: `WalletList.test.tsx`).
+- Frontend Test (Angular): `{tên-file}.spec.ts`, đặt **cạnh file nguồn** (ví dụ: `wallet-list.spec.ts`, `wallet.service.spec.ts`, `auth.guard.spec.ts`). Khối `describe` dùng tên lớp/hàm (`describe('WalletList', ...)`), mỗi `it` mô tả hành vi (`it('should show empty state when user has no wallet', ...)`).
 
 ### 5.4. Quy tắc đặt tên Phương thức Test
 Bắt buộc áp dụng cấu trúc 3 phần rõ ràng:
@@ -217,6 +273,28 @@ void createWallet_withValidData_shouldReturnCreatedWallet() {
     assertThat(response.getBalance()).isEqualByComparingTo("1000000.00");
     verify(walletRepository, times(1)).save(any(Wallet.class));
 }
+```
+
+Ví dụ Component Test phía Frontend (Angular + Vitest):
+```typescript
+describe('WalletList', () => {
+  it('should show empty state when user has no wallet', async () => {
+    // 1. Arrange (Given)
+    await TestBed.configureTestingModule({
+      imports: [WalletList],
+      providers: [{ provide: WalletService, useValue: { getWallets: vi.fn(() => of([])) } }],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(WalletList);
+
+    // 2. Act (When)
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    // 3. Assert (Then)
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.empty-state')?.textContent).toContain('Bạn chưa có ví nào');
+  });
+});
 ```
 
 ### 5.6. Tiêu chí và Độ bao phủ (Coverage Criteria)

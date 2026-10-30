@@ -88,12 +88,15 @@
 
 > Thay `TV1…TV4` bằng **Họ tên / MSSV** thực tế. Vai trò được **giữ ổn định trong suốt Sprint**.
 
-| Thành viên | Vai trò | Họ tên / MSSV | Story phụ trách | SP |
-| :--- | :--- | :--- | :--- | :-: |
-| **TV1** | Scrum Master kiêm Developer BE | `……………` | US1 + nền tảng BE dùng chung | 3 |
-| **TV2** | Developer BE | `……………` | US2, US4, US5 | 8 |
-| **TV3** | Developer FE | `……………` | US3, US6 | 6 |
-| **TV4** | Tester | `……………` | Kiểm thử full flow tài khoản + ví | 17 (SP Test) |
+| Thành viên | Vai trò | Họ tên / MSSV | Story Code phụ trách (SP) | Nhiệm vụ Test chéo (SP Test) | Tổng điểm quy đổi |
+| :--- | :--- | :--- | :--- | :--- | :-: |
+| **TV1** | Scrum Master kiêm Dev BE | `……………` | US1 + nền tảng BE (3 SP) | Điều phối Jira, Review PR, Báo cáo | **3.0** |
+| **TV2** | Dev BE kiêm Tester | `……………` | US2 (3 SP), US4 (3 SP) | T_FE1: Test UI Đăng ký & Đăng nhập (3 SP) | **7.5** |
+| **TV3** | Dev FE kiêm Tester | `……………` | US3 (3 SP), US6 (3 SP) | T_BE2: Test API Tạo ví & Xem ví (5 SP) | **8.5** |
+| **TV4** | Dev BE kiêm Tester chính | `……………` | US5 (2 SP) | T_BE1: Test API Auth (6 SP) + T_FE2: Test UI ví (3 SP) | **6.5** |
+
+> [!NOTE]
+> **Mô hình triển khai: Kiểm thử chéo (Cross-Testing).** TV1 tập trung điều phối và nền tảng; TV2, TV3, TV4 **vừa code (+ Unit Test) vừa kiểm thử chéo** cho nhau. Điều này vừa giúp chia đều tải công việc (TV2 không bị gánh 8 SP, TV4 được tham gia viết code BE), vừa đảm bảo nguyên tắc kiểm thử độc lập khách quan.
 
 ### 3.1. TV1 — Scrum Master kiêm Developer BE
 
@@ -108,30 +111,40 @@
 - Xây dựng nền tảng dùng chung: `ApiResponse<T>`, `GlobalExceptionHandler`, các custom exception.
 - Refactor `User` entity/repository theo bảng `users`; code **API đăng ký** (US1) + Unit Test.
 
-> [!TIP]
-> TV1 chỉ có 3 SP nhưng gánh thêm phần nền tảng dùng chung và công việc Scrum Master. Nên **dành cố định khoảng 1 giờ/ngày** cho điều phối (Daily, cập nhật Jira, review PR). Nếu TV2 bị quá tải (8 SP), phương án dự phòng là chuyển **US5 (2 SP)** sang TV1 sau ngày 5 — chỉ thực hiện khi cả nhóm đồng ý và cập nhật Assignee trên Jira.
+### 3.2. TV2 — Developer BE kiêm Tester
 
-### 3.2. TV2 — Developer BE
-
-- Xây dựng `SecurityConfig`, `JwtTokenProvider`, `JwtAuthenticationFilter`, CORS cho FE.
-- **API đăng nhập** (US2), **API tạo ví** (US4), **API lấy danh sách ví** (US5) + Unit Test.
+**Trách nhiệm Developer BE (6 SP Dev)**
+- Xây dựng `SecurityConfig`, `JwtTokenProvider`, `JwtAuthenticationFilter`, CORS cho FE Angular.
+- **API đăng nhập** (US2), **API tạo ví** (US4) + Unit Test tương ứng.
 - Đảm bảo **quyền sở hữu dữ liệu**: `userId` luôn lấy từ token, không bao giờ lấy từ body/query.
-- Hỗ trợ xử lý lỗi khi tích hợp FE–BE.
 
-### 3.3. TV3 — Developer FE
+**Trách nhiệm Tester chéo (3 SP Test)**
+- Đảm nhận task `T_FE1`: Kiểm thử chức năng & UX trên Giao diện Đăng ký & Đăng nhập (US3 do TV3 làm).
+- Viết Test Case manual kiểm tra validation form, chặn truy cập khi chưa đăng nhập, bắt lỗi BE hiển thị lên UI, ghi Bug trên Jira.
 
+### 3.3. TV3 — Developer FE kiêm Tester
+
+**Trách nhiệm Developer FE (6 SP Dev)**
 - (Ngày 1) Dọn trang mẫu CLI, tạo cấu trúc `core/`, `features/`, `shared/`, `environments/`; cấu hình `provideHttpClient`.
 - Tầng dùng chung: models, `AuthService`, `authInterceptor` (gắn token, xử lý 401), `authGuard`.
 - **Giao diện đăng ký/đăng nhập** (US3), **giao diện quản lý ví** (US6) + component test.
 - Tích hợp API thật; dùng mock theo API Contract (mục 6) khi BE chưa sẵn sàng.
 
-### 3.4. TV4 — Tester
+**Trách nhiệm Tester chéo (5 SP Test)**
+- Đảm nhận task `T_BE2`: Kiểm thử API Tạo ví (US4 của TV2) và API Xem danh sách ví (US5 của TV4).
+- Viết Test Case và Postman Collection kiểm thử nghiệp vụ tạo ví, validate số dư, xem danh sách ví và bảo mật dữ liệu.
 
-- Lập Test Plan, viết Test Case (mục 8) ngay từ ngày 1.
-- Chuẩn bị dữ liệu test, môi trường test (DB riêng `quan_ly_chi_tieu_test` hoặc reset dữ liệu).
-- Viết **Automation Test API** bằng Postman Collection + Newman (chạy được bằng dòng lệnh).
-- Kiểm thử tích hợp FE–BE–CSDL, ghi Bug trên Jira, kiểm thử lại (retest) và Regression.
-- Lập Test Report cuối Sprint.
+### 3.4. TV4 — Developer BE kiêm Tester chính
+
+**Trách nhiệm Developer BE (2 SP Dev)**
+- **API lấy danh sách ví** (US5) + Unit Test `WalletServiceTest`.
+- Phối hợp với TV2 trên Entity và Repository của module Ví.
+
+**Trách nhiệm Tester chính (9 SP Test)**
+- Lập Test Plan tổng thể toàn Sprint ngay từ ngày 1; chuẩn bị CSDL test `quan_ly_chi_tieu_test`.
+- Đảm nhận task `T_BE1` (6 SP): Kiểm thử tự động API Đăng ký (US1 của TV1) & Đăng nhập (US2 của TV2).
+- Đảm nhận task `T_FE2` (3 SP): Kiểm thử giao diện Quản lý ví (US6 của TV3).
+- Điều phối hợp nhất Postman Collection, chạy tự động bằng Newman CLI, xuất báo cáo HTML và lập Test Report tổng kết.
 
 ---
 
@@ -145,16 +158,17 @@ Trên Jira: `Project → Backlog → Create Sprint` → đặt tên **`QNK Sprin
 | US2 | `[BE] Đăng nhập hệ thống` | Epic 1 | TV2 | 3 | US1 (entity `User`) |
 | US3 | `[FE] Giao diện đăng ký và đăng nhập` | Epic 1 | TV3 | 3 | API Contract US1, US2 |
 | US4 | `[BE] Tạo ví mới` | Epic 2 | TV2 | 3 | US2 (JWT) |
-| US5 | `[BE] Xem danh sách ví` | Epic 2 | TV2 | 2 | US2 (JWT), US4 |
+| US5 | `[BE] Xem danh sách ví` | Epic 2 | TV4 | 2 | US2 (JWT), US4 |
 | US6 | `[FE] Giao diện quản lý ví` | Epic 2 | TV3 | 3 | US3 (auth FE), API Contract US4, US5 |
 | | **Tổng SP Developer** | | | **17** | |
-| T1 | `[TEST] Kiểm thử full flow đăng ký và đăng nhập` | Epic 1 | TV4 | 9 | US1, US2, US3 |
-| T2 | `[TEST] Kiểm thử full flow tạo và xem ví` | Epic 2 | TV4 | 8 | US4, US5, US6 |
-| | **Tổng SP Test** | | | **17** | |
+| T_FE1 | `[TEST] Giao diện đăng ký & đăng nhập (US3)` | Epic 1 | TV2 | 3 | US3 |
+| T_BE2 | `[TEST] API Tạo ví & Xem ví (US4, US5)` | Epic 2 | TV3 | 5 | US4, US5 |
+| T_BE1 | `[TEST] API Đăng ký & Đăng nhập (US1, US2)` | Epic 1 | TV4 | 6 | US1, US2 |
+| T_FE2 | `[TEST] Giao diện Quản lý ví (US6)` | Epic 2 | TV4 | 3 | US6 |
+| | **Tổng SP Test chéo** | | | **17** | |
 
-- SP Test = tổng SP của các Story BE + FE mà Tester kiểm thử: **T1 = 3 + 3 + 3 = 9**, **T2 = 3 + 2 + 3 = 8**.
+- **Phân công cân đối:** TV1 (3 SP Dev), TV2 (6 SP Dev + 3 SP Test), TV3 (6 SP Dev + 5 SP Test), TV4 (2 SP Dev + 9 SP Test).
 - Story Point là **ước lượng đề xuất**; nhóm Planning Poker để chốt trước khi Start Sprint.
-- Khối lượng: TV2 có 8 SP BE, TV3 có 6 SP FE → cần đánh giá lại theo năng lực thực tế. **Không bắt buộc hoàn thành tất cả** nếu Sprint vượt khả năng; ưu tiên theo thứ tự **US1 → US2 → US3 → US4 → US5 → US6** để luôn có luồng chạy được.
 
 ---
 
@@ -306,7 +320,7 @@ Trên Jira: `Project → Backlog → Create Sprint` → đặt tên **`QNK Sprin
 
 ---
 
-### US5 — `[BE] Xem danh sách ví` (TV2 · 2 SP)
+### US5 — `[BE] Xem danh sách ví` (TV4 · 2 SP)
 
 **Description**
 > Là người dùng đã đăng nhập, tôi muốn xem danh sách các ví của mình để biết số dư của từng ví.
@@ -322,10 +336,10 @@ Trên Jira: `Project → Backlog → Create Sprint` → đặt tên **`QNK Sprin
 
 | # | Sub-task | Người làm |
 | :-- | :--- | :--- |
-| 5.1 | Thêm `WalletRepository.findByUserIdOrderByCreatedAtDesc()` (hoặc tương đương) | TV2 |
-| 5.2 | Implement `WalletServiceImpl.getWalletsByUser()` + endpoint `GET` | TV2 |
-| 5.3 | Viết và chạy Unit Test (phần danh sách); khuyến khích `WalletRepositoryTest` (`@DataJpaTest`) | TV2 |
-| 5.4 | Tester kiểm thử danh sách ví và quyền sở hữu | TV4 |
+| 5.1 | Thêm `WalletRepository.findByUserIdOrderByCreatedAtDesc()` (hoặc tương đương) | TV4 |
+| 5.2 | Implement `WalletServiceImpl.getWalletsByUser()` + endpoint `GET` | TV4 |
+| 5.3 | Viết và chạy Unit Test (phần danh sách); khuyến khích `WalletRepositoryTest` (`@DataJpaTest`) | TV4 |
+| 5.4 | Tester kiểm thử danh sách ví và quyền sở hữu (TV3 kiểm thử chéo trong `T_BE2`) | TV3 |
 
 **Unit Test tối thiểu**
 
@@ -489,9 +503,11 @@ Chưa có ví: `"data": []`. Lỗi: `401`.
 | `dto.response` | `UserResponse.java` | TV1 |
 | `dto.response` | `LoginResponse.java`, `WalletResponse.java` | TV2 |
 | `service` / `service.impl` | `UserService`, `UserServiceImpl` | TV1 |
-| `service` / `service.impl` | `AuthService`, `AuthServiceImpl`, `WalletService`, `WalletServiceImpl` | TV2 |
+| `service` / `service.impl` | `AuthService`, `AuthServiceImpl` | TV2 |
+| `service` / `service.impl` | `WalletService`, `WalletServiceImpl` | TV2 (code `createWallet`), TV4 (code `getWalletsByUser`) |
 | `controller` | `UserController.java` | TV1 |
-| `controller` | `AuthController.java`, `WalletController.java` | TV2 |
+| `controller` | `AuthController.java` | TV2 |
+| `controller` | `WalletController.java` | TV2 (endpoint POST), TV4 (endpoint GET) |
 | `config` | `SecurityConfig.java`, `JwtAuthenticationFilter.java` | TV2 |
 | `util` | `JwtTokenProvider.java`, `SecurityUtils.java` | TV2 |
 
@@ -650,18 +666,18 @@ tests
 
 ## 9. Lịch làm việc 10 ngày
 
-| Ngày | TV1 — SM + BE | TV2 — BE | TV3 — FE | TV4 — Tester |
+| Ngày | TV1 — SM + BE | TV2 — BE kiêm Tester | TV3 — FE kiêm Tester | TV4 — BE kiêm Tester chính |
 | :-: | :--- | :--- | :--- | :--- |
-| **1** | Sprint Planning, tạo Sprint/Story trên Jira, chốt SP; chốt API Contract; merge PR `chore` (pom, properties) | Chốt API đăng nhập và ví; bắt đầu `SecurityConfig` | Chốt màn hình cần làm; dọn trang mẫu CLI, tạo cấu trúc `core/features/shared`, `environment` | Lập Test Plan, viết Test Case từ AC và API Contract |
-| **2** | `ApiResponse`, `GlobalExceptionHandler`, refactor `User` | JWT provider/filter, `AuthService` | `AuthService`, models, `authInterceptor`, form đăng ký (mock service) | Chuẩn bị dữ liệu test, dựng Postman Collection khung |
-| **3** | API đăng ký + `UserServiceTest` → mở PR | API đăng nhập + `AuthServiceTest` → mở PR | Form đăng nhập, `authGuard`, routes | Bắt đầu test API đăng ký ngay khi có (TC01–03, TC11) |
-| **4** | Review PR của TV2; sửa lỗi đăng ký; hỗ trợ tích hợp | `Wallet` entity, API tạo ví + test | Component test US3; giao diện danh sách ví (mock) | Test API đăng nhập (TC04, TC05, TC12); ghi Bug |
-| **5** | Kiểm tra burndown, gỡ blocker; review PR | API danh sách ví + test → mở PR | Form tạo ví, trạng thái rỗng | Automation cho TC01, TC02, TC04, TC05, TC12 |
-| **6** | Tích hợp, review code; kiểm tra dữ liệu MySQL | Tích hợp ví với CSDL, xử lý lỗi | Nối giao diện tài khoản với API thật | Test API ví (TC06–TC10, TC14–TC16) |
-| **7** | **Mid-sprint check**: đánh giá có cần chuyển việc không | Hỗ trợ FE xử lý CORS/401 | Nối giao diện ví với API thật | Chạy luồng tích hợp tài khoản và ví (TC13, UI) |
-| **8** | Sửa lỗi Backend | Sửa lỗi Backend | Sửa lỗi giao diện | Automation TC06, TC08, TC10, TC14; Regression |
-| **9** | Kiểm tra code, chuẩn bị kịch bản demo | Hoàn thiện Unit Test còn thiếu, coverage | Hoàn thiện component test | Retest Bug, chốt Test Report |
-| **10** | Sprint Review, cập nhật Jira, tổng hợp báo cáo | Demo chức năng BE | Demo chức năng FE | Trình bày kết quả test; Retrospective |
+| **1** | Sprint Planning, tạo Jira, chốt SP; merge PR `pom.xml`, DB | Phác thảo SecurityConfig, JWT; chốt API Contract | Dọn dẹp Angular, tạo cấu trúc `core/features/shared`, `environment` | Lập khung Test Plan Sprint 1; nghiên cứu logic `WalletRepository` |
+| **2** | `ApiResponse`, `GlobalExceptionHandler`, refactor `User` | Implement `SecurityConfig`, JWT provider/filter, `AuthService` | Xây dựng `auth.service`, interceptor, guard, form đăng ký | Viết Test Case cho API Đăng ký & Đăng nhập (`T_BE1`) |
+| **3** | API đăng ký + `UserServiceTest` → mở PR | API đăng nhập + `AuthServiceTest` → mở PR | Hoàn thành form đăng nhập, routing; viết test US3 | Kiểm thử API Đăng ký (US1) ngay khi có PR của TV1; ghi Bug |
+| **4** | Review PR của TV2 & TV4; hỗ trợ tích hợp | `Wallet` entity, API tạo ví + Unit Test US4 → mở PR | Giao diện danh sách ví, form tạo ví (mock data) | Kiểm thử API Đăng nhập (US2); bắt đầu code US5 (`getWalletsByUser`) |
+| **5** | Kiểm tra burndown, gỡ blocker; review PR | Chuẩn bị Test Case cho Giao diện ĐK/ĐN (`T_FE1`) | Hoàn thành màn hình danh sách ví, form tạo ví; viết test US6 | Hoàn thành US5 + `WalletServiceTest` → mở PR; viết Test Case UI ví |
+| **6** | Hỗ trợ TV3 & TV4 tích hợp; review PR US5 | Bắt đầu test UI Đăng ký & Đăng nhập của TV3 (`T_FE1`) | Nối giao diện Đăng ký & Đăng nhập với API thật | Bắt đầu viết kịch bản Postman kiểm thử US4 & US5 |
+| **7** | **Mid-sprint check**: Đánh giá tiến độ; kiểm tra dữ liệu MySQL | Tiếp tục test UI ĐK/ĐN, ghi Bug cho TV3 | Bắt đầu kiểm thử chéo API Tạo ví (US4) và Xem ví (US5) | Kiểm thử chéo UI Quản lý ví của TV3 (`T_FE2`); ghi Bug |
+| **8** | Hỗ trợ nhóm gỡ vướng blocker kỹ thuật | Sửa lỗi Backend US2/US4 (nếu có); retest UI auth | Nối giao diện ví với API thật; sửa lỗi UI theo feedback TV2 | Hợp nhất Postman Collection, chạy tự động bằng Newman |
+| **9** | Kiểm tra code coverage; chuẩn bị kịch bản demo | Hoàn thiện Unit Test US2, US4; chốt kết quả test `T_FE1` | Sửa lỗi UI ví theo feedback TV4; hoàn thiện test US6 | Retest toàn bộ Bug; xuất báo cáo Newman HTML; chốt Test Report |
+| **10** | Sprint Review, cập nhật Jira, tổng hợp báo cáo | Demo chức năng Backend Đăng nhập & Tạo ví | Demo chức năng Frontend trên trình duyệt | Báo cáo kết quả kiểm thử, tỷ lệ Pass/Fail, thống kê Bug |
 
 **Nghi thức Scrum trong Sprint**
 
@@ -782,40 +798,38 @@ fix(wallet): từ chối số dư ban đầu âm
 
 ### 13.1. Bảng điền thật (cuối Sprint)
 
-**Developer**
+Theo mô hình kiểm thử chéo, mỗi thành viên có các dòng nhiệm vụ tương ứng:
 
-| STT | Họ tên / MSSV — Vai trò | Thực hiện Code/Test | SP | Tiến độ | Tổng SP đã xong | Số Unit Test | Điểm quy đổi |
-| :-: | :--- | :--- | :-: | :-: | :-: | :-: | :-: |
-| 1 | `……` — SM kiêm Dev BE | `[BE] Đăng ký tài khoản` | 3 | …% | … | … | … |
-| 2 | `……` — Dev BE | `[BE] Đăng nhập hệ thống` | 3 | …% | | … | |
-| 2 | `……` — Dev BE | `[BE] Tạo ví mới` | 3 | …% | | … | |
-| 2 | `……` — Dev BE | `[BE] Xem danh sách ví` | 2 | …% | … | … | … |
-| 3 | `……` — Dev FE | `[FE] Giao diện đăng ký và đăng nhập` | 3 | …% | | … | |
-| 3 | `……` — Dev FE | `[FE] Giao diện quản lý ví` | 3 | …% | … | … | … |
-
-**Tester**
-
-| STT | Họ tên / MSSV — Vai trò | Thực hiện Code/Test | SP Test | Tiến độ | Tổng SP đã xong | Test Case / Script | Điểm quy đổi |
-| :-: | :--- | :--- | :-: | :-: | :-: | :-: | :-: |
-| 4 | `……` — Tester | `[TEST] Kiểm thử full flow đăng ký và đăng nhập` | 9 | …% | | M: …, A: … | |
-| 4 | `……` — Tester | `[TEST] Kiểm thử full flow tạo và xem ví` | 8 | …% | … | M: …, A: … | … |
+| STT | Họ tên / MSSV | Vai trò | Nhiệm vụ thực hiện | Phân loại | SP | Tiến độ | Số Test thực tế | Điểm quy đổi |
+| :-: | :--- | :--- | :--- | :---: | :-: | :-: | :---: | :-: |
+| **1** | `……` | SM kiêm Dev BE | `[BE] Đăng ký tài khoản` (US1) | Dev | 3 | …% | … Unit Test | … |
+| **2** | `……` | Dev BE kiêm Tester | `[BE] Đăng nhập hệ thống` (US2) | Dev | 3 | …% | … Unit Test | |
+| | | | `[BE] Tạo ví mới` (US4) | Dev | 3 | …% | … Unit Test | |
+| | | | `[TEST] Giao diện đăng ký & đăng nhập` (T_FE1) | Test | 3 | …% | M: …, A: … | … |
+| **3** | `……` | Dev FE kiêm Tester | `[FE] Giao diện đăng ký và đăng nhập` (US3) | Dev | 3 | …% | … Spec Test | |
+| | | | `[FE] Giao diện quản lý ví` (US6) | Dev | 3 | …% | … Spec Test | |
+| | | | `[TEST] API Tạo ví & Xem ví` (T_BE2) | Test | 5 | …% | M: …, A: … | … |
+| **4** | `……` | Dev BE kiêm Tester chính | `[BE] Xem danh sách ví` (US5) | Dev | 2 | …% | … Unit Test | |
+| | | | `[TEST] API Đăng ký & Đăng nhập` (T_BE1) | Test | 6 | …% | M: …, A: … | |
+| | | | `[TEST] Giao diện Quản lý ví` (T_FE2) | Test | 3 | …% | M: …, A: … | … |
 
 ### 13.2. Ví dụ minh họa (giả định mọi Story hoàn thành 100%)
 
 > [!CAUTION]
-> Các con số dưới đây **chỉ để minh họa cách tính**. Không chép vào báo cáo thật — phải thay bằng số liệu thực tế từ Jira, kết quả `mvn test`, `npm run test` và Newman.
+> Các con số dưới đây **chỉ để minh họa cách tính theo mô hình kiểm thử chéo**. Khi kết thúc Sprint, phải thay bằng số liệu thực tế từ Jira, kết quả `mvn test`, `npm run test` và Newman.
 
-| Thành viên | Vai trò | Story | SP hoàn thành | Unit Test / Test Case minh họa | Điểm quy đổi |
-| :--- | :--- | :--- | :-: | :--- | :-: |
-| TV1 | SM kiêm Dev | US1 | 3 | 4 Unit Test (+2 Controller test) | 3 |
-| TV2 | Dev BE | US2, US4, US5 | 3 + 3 + 2 = 8 | 4 + 4 + 3 = 11 Unit Test | 8 |
-| TV3 | Dev FE | US3, US6 | 3 + 3 = 6 | Theo thực tế (≈ 7 component test) | 6 |
-| TV4 | Tester | T1, T2 | 9 + 8 = 17 SP Test | M: 16, A: 9 (kế hoạch mục 8.3) | 17 × 50% = **8,5** |
+| Thành viên | Vai trò | Story Dev hoàn thành | SP Dev | Story Test hoàn thành | SP Test | Tổng điểm quy đổi |
+| :--- | :--- | :--- | :-: | :--- | :-: | :---: |
+| **TV1** | SM kiêm Dev | US1 | 3 | — | — | **3.0** |
+| **TV2** | Dev BE kiêm Tester | US2 (3) + US4 (3) | 6 | T_FE1 (3) | 3 | $6 + 3 \times 50\% =$ **7.5** |
+| **TV3** | Dev FE kiêm Tester | US3 (3) + US6 (3) | 6 | T_BE2 (5) | 5 | $6 + 5 \times 50\% =$ **8.5** |
+| **TV4** | Dev BE kiêm Tester chính | US5 (2) | 2 | T_BE1 (6) + T_FE2 (3) | 9 | $2 + 9 \times 50\% =$ **6.5** |
+| **TỔNG** | | | **17** | | **17** | **25.5** |
 
 **Cách tính:**
-- Developer: điểm quy đổi = tổng SP của các Story **đạt 100%**. Ví dụ TV2 chỉ xong US2 và US4 → 6 SP, US5 không được tính.
-- Tester: SP Test của một luồng = tổng SP các Story BE + FE trong luồng đó; điểm quy đổi = tổng SP Test hoàn thành × 50%. Luồng nào chưa kiểm thử xong đúng tiêu chí thì không tính.
-- **Không cộng** SP Developer với SP Test để tính thành tích chung, vì đó là hai loại đóng góp cho cùng chức năng.
+- Phần Code (Developer): điểm quy đổi = $100\% \times \text{tổng SP Dev hoàn thành 100\%}$.
+- Phần Test (Tester): điểm quy đổi = $50\% \times \text{tổng SP Test hoàn thành 100\%}$.
+- Tổng điểm cá nhân = Điểm Dev + Điểm Test.
 - TV1 ghi rõ vai trò kiêm nhiệm; công việc Scrum Master thể hiện qua bằng chứng: Sprint/Story trên Jira, biên bản Daily/Review/Retro, PR đã review.
 
 ### 13.3. Bằng chứng cần thu thập trong Sprint

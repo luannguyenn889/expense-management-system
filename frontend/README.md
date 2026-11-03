@@ -2,6 +2,15 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.1.
 
+## Sprint 1 features
+
+- Registration and sign-in use `/api/v1/users/register` and `/api/v1/auth/login`.
+- Wallet listing and creation use `/api/v1/wallets`; wallet routes require a valid session token.
+- The API base URL is configured in `src/environments/environment.ts`. The API is expected to return the shared `{ code, message, data }` response shape.
+- The session token is kept in `sessionStorage` and sent as a bearer token. Clear it by signing out; a `401` response also clears it.
+
+The backend must provide the registration, authentication, and wallet endpoints before these screens can be used against a live API.
+
 ## Development server
 
 To start a local development server, run:

@@ -1,0 +1,40 @@
+.success-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d6ebdd;
+  border-radius: 10px;
+  background: #f3fbf5;
+  color: #275b3b;
+}
+
+.success-icon {
+  display: grid;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: #d7eddd;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.success-panel strong {
+  font-size: 14px;
+}
+
+.success-panel p {
+  margin: 4px 0 0;
+  color: #55725f;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.success-link {
+  display: grid;
+  margin-top: 18px;
+  place-items: center;
+  text-decoration: none;
+}

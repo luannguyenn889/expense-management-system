@@ -1,26 +1,40 @@
 package com.expensemanagement.backend.entity;
-import java.time.LocalDate;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-// Entity la lop tuong ung voi bang trong database, chua thong tin va cau truc cua bang, de spring tao bang trong database va tuong tac voi database
+import java.time.LocalDateTime;
+
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
-@Table(name = "users")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userid", nullable = false) // Map to userid (case-insensitive for MySQL)
-    private Long id;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    private String username;
-    private  String password;
-    private String firstname;
-    private String lastname;
-    private LocalDate dob;
+    @Column(name = "full_name", nullable = false, length = 100)
+    private String fullName;
 
+    @Column(name = "email", nullable = false, unique = true, length = 255)
+    private String email;
 
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }

@@ -21,13 +21,15 @@ export class Login {
 
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly googleLoginMessage = signal('');
   protected readonly loginForm = this.formBuilder.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   protected onSubmit(): void {
     this.errorMessage.set('');
+    this.googleLoginMessage.set('');
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -43,7 +45,15 @@ export class Login {
       .subscribe({
         next: () => void this.router.navigateByUrl('/wallets'),
         error: (error: unknown) =>
-          this.errorMessage.set(getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng thử lại.')),
+          this.errorMessage.set(
+            getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng thử lại.'),
+          ),
       });
+  }
+
+  protected onGoogleLogin(): void {
+    this.googleLoginMessage.set(
+      'Đăng nhập Google chưa khả dụng: backend OAuth chưa được tích hợp.',
+    );
   }
 }

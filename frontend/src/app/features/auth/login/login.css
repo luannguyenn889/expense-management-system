@@ -68,6 +68,56 @@
   gap: 2px;
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: #78877d;
+  font-size: 13px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  flex: 1;
+  height: 1px;
+  background: #e8eee8;
+  content: '';
+}
+
+.social-login-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.social-login-button {
+  display: flex;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dce5de;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.social-login-button:hover {
+  background: #f8faf8;
+}
+
+.social-login-button:focus-visible {
+  outline: 3px solid rgb(57 129 90 / 30%);
+  outline-offset: 3px;
+}
+
+.google-mark {
+  color: #4285f4;
+  font-size: 18px;
+  font-weight: 700;
+}
+
 .auth-card .field input:focus-visible,
 .primary-button:focus-visible,
 .auth-footer a:focus-visible,

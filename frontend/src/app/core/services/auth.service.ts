@@ -8,18 +8,22 @@ import {
   AuthSession,
   LoginRequest,
   UserCreationRequest,
-  UserResponse,
 } from '../models/auth.model';
 import { unwrapApiResponse } from '../utils/api-response.util';
 
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
-  register(request: UserCreationRequest): Observable<UserResponse> {
+  register(request: UserCreationRequest): Observable<AuthSession> {
     return this.http
-      .post<ApiResponse<UserResponse>>(`${this.apiUrl}/users/register`, request)
-      .pipe(map(unwrapApiResponse));
+      .post<ApiResponse<AuthSession>>(`${this.apiUrl}/users/register`, request)
+      .pipe(
+        map(unwrapApiResponse),
+        map((session) => this.requireToken(session)),
+        tap((session) => sessionStorage.setItem(TOKEN_STORAGE_KEY, session.token)),
+      );
   }
 
   login(request: LoginRequest): Observable<AuthSession> {
@@ -27,12 +31,7 @@ export class AuthService {
       .post<ApiResponse<AuthSession>>(`${this.apiUrl}/auth/login`, request)
       .pipe(
         map(unwrapApiResponse),
-        map((session) => {
-          if (!session.token?.trim()) {
-            throw new Error('Phản hồi đăng nhập không chứa token hợp lệ.');
-          }
-          return session;
-        }),
+        map((session) => this.requireToken(session)),
         tap((session) => sessionStorage.setItem(TOKEN_STORAGE_KEY, session.token)),
       );
   }
@@ -48,6 +47,12 @@ export class AuthService {
   logout(): void {
     sessionStorage.removeItem(TOKEN_STORAGE_KEY);
   }
-}
 
-Injectable({ providedIn: 'root' })(AuthService);
+  private requireToken(session: AuthSession): AuthSession {
+    if (!session.token?.trim()) {
+      throw new Error('Phản hồi xác thực không chứa token hợp lệ.');
+    }
+
+    return session;
+  }
+}

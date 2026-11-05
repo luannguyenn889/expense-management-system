@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 import { AuthService } from '../../../core/services/auth.service';
@@ -21,7 +21,7 @@ describe('Login', () => {
     fixture.detectChanges();
 
     expect(authService.login).not.toHaveBeenCalled();
-    expect(fixture.nativeElement.textContent).toContain('Vui lòng nhập email.');
+    expect(fixture.nativeElement.textContent).toContain('Vui lòng nhập tên đăng nhập.');
     expect(fixture.nativeElement.textContent).toContain('Vui lòng nhập mật khẩu.');
   });
 
@@ -38,7 +38,7 @@ describe('Login', () => {
     const fixture = TestBed.createComponent(Login);
     fixture.detectChanges();
     const inputs = fixture.nativeElement.querySelectorAll('input');
-    inputs[0].value = 'user@example.com';
+    inputs[0].value = 'minhanh';
     inputs[0].dispatchEvent(new Event('input'));
     inputs[1].value = 'password123';
     inputs[1].dispatchEvent(new Event('input'));
@@ -49,9 +49,10 @@ describe('Login', () => {
     await fixture.whenStable();
 
     expect(authService.login).toHaveBeenCalledWith({
-      email: 'user@example.com',
+      username: 'minhanh',
       password: 'password123',
     });
+    expect(TestBed.inject(Router).url).toBe('/wallets');
   });
 
   it('should show an API error after a rejected sign-in', async () => {
@@ -66,7 +67,7 @@ describe('Login', () => {
     const fixture = TestBed.createComponent(Login);
     fixture.detectChanges();
     const inputs = fixture.nativeElement.querySelectorAll('input');
-    inputs[0].value = 'user@example.com';
+    inputs[0].value = 'minhanh';
     inputs[0].dispatchEvent(new Event('input'));
     inputs[1].value = 'password123';
     inputs[1].dispatchEvent(new Event('input'));
@@ -76,5 +77,24 @@ describe('Login', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Thông tin đăng nhập không đúng.');
+  });
+
+  it('should explain that Google sign-in is unavailable until backend OAuth is configured', async () => {
+    await TestBed.configureTestingModule({
+      imports: [Login],
+      providers: [provideRouter([]), { provide: AuthService, useValue: { login: vi.fn() } }],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(Login);
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('.social-login-button').click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.social-login-button').textContent.trim()).toBe(
+      'G',
+    );
+    expect(fixture.nativeElement.textContent).toContain(
+      'Đăng nhập Google chưa khả dụng: backend OAuth chưa được tích hợp.',
+    );
   });
 });

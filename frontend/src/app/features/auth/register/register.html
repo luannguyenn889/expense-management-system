@@ -1,26 +1,38 @@
 <main class="auth-page">
-  <section class="auth-card" aria-labelledby="register-title">
-    <a class="brand" routerLink="/login" aria-label="Ví Của Tôi - trang đăng nhập">
-      <span class="brand-mark" aria-hidden="true">v.</span>
-      <span>ví của tôi</span>
-    </a>
+  <div class="register-layout">
+    <aside class="app-intro" aria-labelledby="app-intro-title">
+      <a
+        class="brand"
+        routerLink="/login"
+        aria-label="Ví Của Tôi - trang đăng nhập"
+      >
+        <span class="brand-mark" aria-hidden="true">v.</span>
+        <span>ví của tôi</span>
+      </a>
 
-    <div class="auth-heading">
-      <p class="eyebrow">BẮT ĐẦU HÀNH TRÌNH</p>
-      <h1 id="register-title">Tạo tài khoản</h1>
-      <p class="auth-description">Chỉ mất một phút để bắt đầu quản lý tiền thông minh hơn.</p>
-    </div>
+      <div class="intro-copy">
+        <p class="eyebrow">QUẢN LÝ TÀI CHÍNH CÁ NHÂN</p>
+        <h1 id="app-intro-title">Chi tiêu rõ ràng, an tâm mỗi ngày.</h1>
+        <p class="intro-description">
+          Ví Của Tôi giúp bạn theo dõi các khoản thu chi và quản lý ví cá nhân
+          dễ dàng hơn.
+        </p>
 
-    @if (isRegistered()) {
-      <div class="success-panel" role="status">
-        <span class="success-icon" aria-hidden="true">✓</span>
-        <div>
-          <strong>Đăng ký thành công</strong>
-          <p>Tài khoản của bạn đã sẵn sàng. Hãy đăng nhập để tiếp tục.</p>
-        </div>
+        <ul class="intro-benefits">
+          <li>Theo dõi số dư các ví của bạn</li>
+          <li>Ghi nhận thu nhập và chi tiêu</li>
+          <li>Nắm bắt kế hoạch ngân sách</li>
+        </ul>
       </div>
-      <a class="primary-button success-link" routerLink="/login">Đến trang đăng nhập</a>
-    } @else {
+
+      <p class="intro-note">
+        Bắt đầu từ những thói quen nhỏ để làm chủ tài chính của bạn.
+      </p>
+    </aside>
+
+    <section class="auth-card" aria-label="Đăng ký tài khoản">
+      <h2 class="register-title">Tạo tài khoản</h2>
+
       @if (errorMessage()) {
         <p class="form-alert" role="alert">{{ errorMessage() }}</p>
       }
@@ -33,14 +45,58 @@
             type="text"
             autocomplete="name"
             placeholder="Nguyễn Minh Anh"
-            [attr.aria-invalid]="registerForm.controls.fullName.invalid && registerForm.controls.fullName.touched"
+            [attr.aria-invalid]="
+              registerForm.controls.fullName.invalid && registerForm.controls.fullName.touched
+            "
           />
-          @if (registerForm.controls.fullName.touched && registerForm.controls.fullName.hasError('required')) {
+          @if (
+            registerForm.controls.fullName.touched &&
+            registerForm.controls.fullName.hasError('required')
+          ) {
             <small class="field-error">Vui lòng nhập họ và tên.</small>
-          } @else if (registerForm.controls.fullName.touched && registerForm.controls.fullName.hasError('pattern')) {
-            <small class="field-error">Họ và tên không được chỉ chứa khoảng trắng.</small>
-          } @else if (registerForm.controls.fullName.touched && registerForm.controls.fullName.hasError('maxlength')) {
-            <small class="field-error">Họ và tên không được vượt quá 100 ký tự.</small>
+          } @else if (
+            registerForm.controls.fullName.touched &&
+            registerForm.controls.fullName.hasError('pattern')
+          ) {
+            <small class="field-error">
+              Họ và tên không được chỉ chứa khoảng trắng.
+            </small>
+          } @else if (
+            registerForm.controls.fullName.touched &&
+            registerForm.controls.fullName.hasError('maxlength')
+          ) {
+            <small class="field-error">
+              Họ và tên không được vượt quá 100 ký tự.
+            </small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Tên đăng nhập</span>
+          <input
+            formControlName="username"
+            type="text"
+            autocomplete="username"
+            placeholder="Tên đăng nhập"
+            [attr.aria-invalid]="
+              registerForm.controls.username.invalid && registerForm.controls.username.touched
+            "
+          />
+          @if (
+            registerForm.controls.username.touched &&
+            registerForm.controls.username.hasError('required')
+          ) {
+            <small class="field-error">Vui lòng nhập tên đăng nhập.</small>
+          } @else if (
+            registerForm.controls.username.touched &&
+            (
+              registerForm.controls.username.hasError('minlength') ||
+              registerForm.controls.username.hasError('maxlength')
+            )
+          ) {
+            <small class="field-error">
+              Tên đăng nhập phải có từ 3 đến 30 ký tự.
+            </small>
           }
         </label>
 
@@ -51,11 +107,19 @@
             type="email"
             autocomplete="email"
             placeholder="ban@email.com"
-            [attr.aria-invalid]="registerForm.controls.email.invalid && registerForm.controls.email.touched"
+            [attr.aria-invalid]="
+              registerForm.controls.email.invalid && registerForm.controls.email.touched
+            "
           />
-          @if (registerForm.controls.email.touched && registerForm.controls.email.hasError('required')) {
+          @if (
+            registerForm.controls.email.touched &&
+            registerForm.controls.email.hasError('required')
+          ) {
             <small class="field-error">Vui lòng nhập email.</small>
-          } @else if (registerForm.controls.email.touched && registerForm.controls.email.hasError('email')) {
+          } @else if (
+            registerForm.controls.email.touched &&
+            registerForm.controls.email.hasError('email')
+          ) {
             <small class="field-error">Email chưa đúng định dạng.</small>
           }
         </label>
@@ -67,11 +131,19 @@
             type="password"
             autocomplete="new-password"
             placeholder="Ít nhất 8 ký tự"
-            [attr.aria-invalid]="registerForm.controls.password.invalid && registerForm.controls.password.touched"
+            [attr.aria-invalid]="
+              registerForm.controls.password.invalid && registerForm.controls.password.touched
+            "
           />
-          @if (registerForm.controls.password.touched && registerForm.controls.password.hasError('required')) {
+          @if (
+            registerForm.controls.password.touched &&
+            registerForm.controls.password.hasError('required')
+          ) {
             <small class="field-error">Vui lòng nhập mật khẩu.</small>
-          } @else if (registerForm.controls.password.touched && registerForm.controls.password.hasError('minlength')) {
+          } @else if (
+            registerForm.controls.password.touched &&
+            registerForm.controls.password.hasError('minlength')
+          ) {
             <small class="field-error">Mật khẩu phải có ít nhất 8 ký tự.</small>
           }
         </label>
@@ -83,17 +155,23 @@
             type="password"
             autocomplete="new-password"
             placeholder="Nhập lại mật khẩu"
-            [attr.aria-invalid]="registerForm.controls.confirmPassword.invalid && registerForm.controls.confirmPassword.touched || registerForm.hasError('passwordMismatch') && registerForm.controls.confirmPassword.touched"
+            [attr.aria-invalid]="isConfirmPasswordInvalid"
           />
-          @if (registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.hasError('required')) {
+          @if (
+            registerForm.controls.confirmPassword.touched &&
+            registerForm.controls.confirmPassword.hasError('required')
+          ) {
             <small class="field-error">Vui lòng xác nhận mật khẩu.</small>
-          } @else if (registerForm.controls.confirmPassword.touched && registerForm.hasError('passwordMismatch')) {
+          } @else if (
+            registerForm.controls.confirmPassword.touched &&
+            registerForm.hasError('passwordMismatch')
+          ) {
             <small class="field-error">Mật khẩu xác nhận không khớp.</small>
           }
         </label>
 
         <button class="primary-button" type="submit" [disabled]="isLoading()">
-          {{ isLoading() ? 'Đang tạo tài khoản...' : 'Tạo tài khoản' }}
+          {{ isLoading() ? 'Đang đăng ký...' : 'Đăng ký' }}
         </button>
       </form>
 
@@ -101,6 +179,6 @@
         Đã có tài khoản?
         <a routerLink="/login">Đăng nhập</a>
       </p>
-    }
-  </section>
+    </section>
+  </div>
 </main>

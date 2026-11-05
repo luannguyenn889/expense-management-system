@@ -1,6 +1,10 @@
 <main class="auth-page">
   <section class="auth-card" aria-labelledby="login-title">
-    <a class="brand" routerLink="/login" aria-label="Ví Của Tôi - trang đăng nhập">
+    <a
+      class="brand"
+      routerLink="/login"
+      aria-label="Ví Của Tôi - trang đăng nhập"
+    >
       <span class="brand-mark" aria-hidden="true">v.</span>
       <span>ví của tôi</span>
     </a>
@@ -8,7 +12,9 @@
     <div class="auth-heading">
       <p class="eyebrow">CHÀO MỪNG TRỞ LẠI</p>
       <h1 id="login-title">Đăng nhập</h1>
-      <p class="auth-description">Đăng nhập để quản lý ví và theo dõi chi tiêu của bạn.</p>
+      <p class="auth-description">
+        Đăng nhập để quản lý ví và theo dõi chi tiêu của bạn.
+      </p>
     </div>
 
     @if (errorMessage()) {
@@ -17,18 +23,31 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
       <label class="field">
-        <span>Email</span>
+        <span>Tên đăng nhập</span>
         <input
-          formControlName="email"
-          type="email"
-          autocomplete="email"
-          placeholder="ban@email.com"
-          [attr.aria-invalid]="loginForm.controls.email.invalid && loginForm.controls.email.touched"
+          formControlName="username"
+          type="text"
+          autocomplete="username"
+          placeholder="Tên đăng nhập"
+          [attr.aria-invalid]="
+            loginForm.controls.username.invalid && loginForm.controls.username.touched
+          "
         />
-        @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('required')) {
-          <small class="field-error">Vui lòng nhập email.</small>
-        } @else if (loginForm.controls.email.touched && loginForm.controls.email.hasError('email')) {
-          <small class="field-error">Email chưa đúng định dạng.</small>
+        @if (
+          loginForm.controls.username.touched &&
+          loginForm.controls.username.hasError('required')
+        ) {
+          <small class="field-error">Vui lòng nhập tên đăng nhập.</small>
+        } @else if (
+          loginForm.controls.username.touched &&
+          (
+            loginForm.controls.username.hasError('minlength') ||
+            loginForm.controls.username.hasError('maxlength')
+          )
+        ) {
+          <small class="field-error">
+            Tên đăng nhập phải có từ 3 đến 30 ký tự.
+          </small>
         }
       </label>
 
@@ -39,11 +58,19 @@
           type="password"
           autocomplete="current-password"
           placeholder="Ít nhất 8 ký tự"
-          [attr.aria-invalid]="loginForm.controls.password.invalid && loginForm.controls.password.touched"
+          [attr.aria-invalid]="
+            loginForm.controls.password.invalid && loginForm.controls.password.touched
+          "
         />
-        @if (loginForm.controls.password.touched && loginForm.controls.password.hasError('required')) {
+        @if (
+          loginForm.controls.password.touched &&
+          loginForm.controls.password.hasError('required')
+        ) {
           <small class="field-error">Vui lòng nhập mật khẩu.</small>
-        } @else if (loginForm.controls.password.touched && loginForm.controls.password.hasError('minlength')) {
+        } @else if (
+          loginForm.controls.password.touched &&
+          loginForm.controls.password.hasError('minlength')
+        ) {
           <small class="field-error">Mật khẩu phải có ít nhất 8 ký tự.</small>
         }
       </label>
@@ -52,6 +79,24 @@
         {{ isLoading() ? 'Đang đăng nhập...' : 'Đăng nhập' }}
       </button>
     </form>
+
+    <div class="auth-divider" aria-hidden="true">
+      <span>hoặc</span>
+    </div>
+    <div class="social-login-actions" aria-label="Đăng nhập bằng mạng xã hội">
+      <button
+        class="social-login-button google-button"
+        type="button"
+        aria-label="Đăng nhập bằng Google"
+        title="Đăng nhập bằng Google"
+        (click)="onGoogleLogin()"
+      >
+        <span class="google-mark" aria-hidden="true">G</span>
+      </button>
+    </div>
+    @if (googleLoginMessage()) {
+      <p class="form-alert" role="status">{{ googleLoginMessage() }}</p>
+    }
 
     <p class="auth-footer">
       Chưa có tài khoản?

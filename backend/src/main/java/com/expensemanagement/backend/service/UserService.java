@@ -1,57 +1,78 @@
 package com.expensemanagement.backend.service;
 
 import com.expensemanagement.backend.DTO.request.UserCreationRequest;
-import com.expensemanagement.backend.DTO.request.UserUpdateRequest;
+import com.expensemanagement.backend.DTO.response.UserResponse;
 import com.expensemanagement.backend.entity.User;
+import com.expensemanagement.backend.exception.DuplicateResourceException;
+import com.expensemanagement.backend.exception.ResourceNotFoundException;
 import com.expensemanagement.backend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-// Service la lop chua logic xu ly, tuong tac voi repository de lay du lieu va tra ve cho controller de tra ve cho client
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-    
-    public User createRequest(UserCreationRequest request){
-       User users = new User();
-       users.setUsername(request.getUsername());
-       users.setPassword(request.getPassword());
-       users.setFirstname(request.getFirstname());
-       users.setLastname(request.getLastname());
-       users.setDob(request.getDob());
 
-       return userRepository.save(users);
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    @Transactional
+    public UserResponse register(UserCreationRequest request) {
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new DuplicateResourceException("Email đã được sử dụng");
+        }
+
+        User user = User.builder()
+                .fullName(request.getFullName().trim())
+                .email(normalizedEmail)
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        return mapToUserResponse(savedUser);
     }
 
-    public User getUser(Long id){
-       return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
     }
 
-    public User updateRequest(Long userID, UserUpdateRequest request){
-        User users = getUser(userID);
-        users.setFirstname(request.getFirstname());
-        users.setLastname(request.getLastname());
-        users.setDob(request.getDob());
-        users.setPassword(request.getPassword());
-// Tra ve Responsitory de luu vao db
-        return userRepository.save(users);
+    public UserResponse getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng với ID: " + userId));
+        return mapToUserResponse(user);
     }
 
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 
-    // Tim user theo username va password (su dung query thong qua Spring Data JPA cho toi uu)
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException("Không tìm thấy người dùng với ID: " + userId);
+        }
+        userRepository.deleteById(userId);
     }
-    
-    // Tim user theo password -> ban khong nen co ham nay, rat mat bao mat va khong thuc te.
+
+    public UserResponse mapToUserResponse(User user) {
+        return UserResponse.builder()
+                .userId(user.getUserId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
 }

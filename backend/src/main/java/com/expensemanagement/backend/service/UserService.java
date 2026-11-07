@@ -24,8 +24,19 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * US1 [CNTT46-37]: Xử lý nghiệp vụ đăng ký tài khoản mới.
+     * - Kiểm tra mật khẩu xác nhận (confirmPassword) phải khớp với mật khẩu (password).
+     * - Chuẩn hóa username và email về chữ thường, cắt khoảng trắng thừa.
+     * - Kiểm tra trùng lặp username/email (ném DuplicateResourceException - HTTP 409).
+     * - Băm mật khẩu bằng BCrypt trước khi lưu vào CSDL.
+     */
     @Transactional
     public UserResponse register(UserCreationRequest request) {
+        if (request.getConfirmPassword() != null && !request.getPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Mật khẩu xác nhận không khớp");
+        }
+
         String normalizedEmail = request.getEmail().trim().toLowerCase();
         String normalizedUsername = request.getUsername().trim().toLowerCase();
 

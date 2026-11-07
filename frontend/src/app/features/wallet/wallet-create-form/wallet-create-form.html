@@ -1,0 +1,56 @@
+<section class="create-card" aria-labelledby="create-wallet-title">
+  <div class="section-heading">
+    <span class="section-icon" aria-hidden="true">＋</span>
+    <div>
+      <h2 id="create-wallet-title">Tạo ví mới</h2>
+      <p>Tạo một ví để bắt đầu theo dõi chi tiêu.</p>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="form-alert" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <form [formGroup]="walletForm" (ngSubmit)="onSubmit()" novalidate>
+    <label class="field">
+      <span>Tên ví</span>
+      <input
+        formControlName="walletName"
+        type="text"
+        autocomplete="off"
+        placeholder="Ví dụ: Chi tiêu hằng ngày"
+        [attr.aria-invalid]="walletForm.controls.walletName.invalid && walletForm.controls.walletName.touched"
+      />
+      @if (walletForm.controls.walletName.touched && walletForm.controls.walletName.hasError('required')) {
+        <small class="field-error">Vui lòng nhập tên ví.</small>
+      } @else if (walletForm.controls.walletName.touched && walletForm.controls.walletName.hasError('pattern')) {
+        <small class="field-error">Tên ví không được chỉ chứa khoảng trắng.</small>
+      } @else if (walletForm.controls.walletName.touched && walletForm.controls.walletName.hasError('maxlength')) {
+        <small class="field-error">Tên ví không được vượt quá 60 ký tự.</small>
+      }
+    </label>
+
+    <label class="field">
+      <span>Số dư ban đầu</span>
+      <div class="amount-input">
+        <input
+          formControlName="balance"
+          type="number"
+          min="0"
+          step="1000"
+          inputmode="numeric"
+          aria-describedby="wallet-balance-unit"
+          [attr.aria-invalid]="walletForm.controls.balance.invalid && walletForm.controls.balance.touched"
+        />
+        <span id="wallet-balance-unit">VND</span>
+      </div>
+      @if (walletForm.controls.balance.touched && walletForm.controls.balance.hasError('min')) {
+        <small class="field-error">Số dư không được nhỏ hơn 0.</small>
+      }
+    </label>
+
+    <button class="primary-button" type="submit" [disabled]="isLoading()">
+      {{ isLoading() ? 'Đang tạo ví...' : 'Tạo ví' }}
+    </button>
+  </form>
+</section>

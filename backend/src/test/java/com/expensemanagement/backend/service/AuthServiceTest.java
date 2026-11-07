@@ -58,6 +58,7 @@ class AuthServiceTest {
 
         User mockUser = User.builder()
                 .userId(1L)
+                .username("nguyenvana")
                 .fullName("Nguyen Van A")
                 .email(email)
                 .passwordHash(encodedHash)
@@ -68,7 +69,7 @@ class AuthServiceTest {
                 .password(rawPassword)
                 .build();
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmailOrUsername(email, email)).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(rawPassword, encodedHash)).thenReturn(true);
 
         // 2. Act (When)
@@ -80,10 +81,46 @@ class AuthServiceTest {
         assertThat(response.getTokenType()).isEqualTo("Bearer");
         assertThat(response.getUser()).isNotNull();
         assertThat(response.getUser().getUserId()).isEqualTo(1L);
+        assertThat(response.getUser().getUsername()).isEqualTo("nguyenvana");
         assertThat(response.getUser().getEmail()).isEqualTo(email);
 
-        verify(userRepository, times(1)).findByEmail(email);
+        verify(userRepository, times(1)).findByEmailOrUsername(email, email);
         verify(passwordEncoder, times(1)).matches(rawPassword, encodedHash);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập bằng Username thành công -> Trả về Access Token")
+    void login_withValidUsername_shouldReturnToken() {
+        // 1. Arrange (Given)
+        String username = "nguyenvana";
+        String rawPassword = "Password123@";
+        String encodedHash = "$2a$10$hashedPasswordValue";
+
+        User mockUser = User.builder()
+                .userId(1L)
+                .username(username)
+                .fullName("Nguyen Van A")
+                .email("user@example.com")
+                .passwordHash(encodedHash)
+                .build();
+
+        LoginRequest request = LoginRequest.builder()
+                .username(username)
+                .password(rawPassword)
+                .build();
+
+        when(userRepository.findByEmailOrUsername(username, username)).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(rawPassword, encodedHash)).thenReturn(true);
+
+        // 2. Act (When)
+        LoginResponse response = authService.login(request);
+
+        // 3. Assert (Then)
+        assertThat(response).isNotNull();
+        assertThat(response.getAccessToken()).isNotBlank();
+        assertThat(response.getUser().getUsername()).isEqualTo(username);
+
+        verify(userRepository, times(1)).findByEmailOrUsername(username, username);
     }
 
     @Test
@@ -96,6 +133,7 @@ class AuthServiceTest {
 
         User mockUser = User.builder()
                 .userId(1L)
+                .username("nguyenvana")
                 .fullName("Nguyen Van A")
                 .email(email)
                 .passwordHash(encodedHash)
@@ -106,7 +144,7 @@ class AuthServiceTest {
                 .password(wrongPassword)
                 .build();
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmailOrUsername(email, email)).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(wrongPassword, encodedHash)).thenReturn(false);
 
         // 2. Act (When) & 3. Assert (Then)
@@ -114,7 +152,7 @@ class AuthServiceTest {
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessage("Email hoặc mật khẩu không chính xác");
 
-        verify(userRepository, times(1)).findByEmail(email);
+        verify(userRepository, times(1)).findByEmailOrUsername(email, email);
         verify(passwordEncoder, times(1)).matches(wrongPassword, encodedHash);
     }
 
@@ -128,14 +166,14 @@ class AuthServiceTest {
                 .password("Password123@")
                 .build();
 
-        when(userRepository.findByEmail(nonExistingEmail)).thenReturn(Optional.empty());
+        when(userRepository.findByEmailOrUsername(nonExistingEmail, nonExistingEmail)).thenReturn(Optional.empty());
 
         // 2. Act (When) & 3. Assert (Then)
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessage("Email hoặc mật khẩu không chính xác");
 
-        verify(userRepository, times(1)).findByEmail(nonExistingEmail);
+        verify(userRepository, times(1)).findByEmailOrUsername(nonExistingEmail, nonExistingEmail);
         verify(passwordEncoder, never()).matches(anyString(), anyString());
     }
 
@@ -172,6 +210,7 @@ class AuthServiceTest {
 
         User existingUser = User.builder()
                 .userId(10L)
+                .username("googleuser")
                 .fullName(googleName)
                 .email(googleEmail)
                 .passwordHash("hashed")
@@ -186,6 +225,7 @@ class AuthServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.getAccessToken()).isNotBlank();
         assertThat(response.getUser().getEmail()).isEqualTo(googleEmail);
+        assertThat(response.getUser().getUsername()).isEqualTo("googleuser");
         assertThat(response.getUser().getUserId()).isEqualTo(10L);
 
         verify(googleAuthVerifier, times(1)).verify(rawGoogleToken);
@@ -213,6 +253,7 @@ class AuthServiceTest {
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         User savedUser = User.builder()
                 .userId(20L)
+                .username("newuser")
                 .fullName(googleName)
                 .email(googleEmail)
                 .passwordHash("$2a$10$randomHash")
@@ -231,6 +272,7 @@ class AuthServiceTest {
         User captured = userCaptor.getValue();
         assertThat(captured.getEmail()).isEqualTo(googleEmail);
         assertThat(captured.getFullName()).isEqualTo(googleName);
+        assertThat(captured.getUsername()).isNotBlank();
         verify(userRepository, times(1)).save(any(User.class));
     }
 

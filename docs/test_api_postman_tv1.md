@@ -28,13 +28,15 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
  │    └── 0.1. Kiểm tra trạng thái máy chủ [GET /api/health]
  ├── 📂 1. Epic 1: Quản lý Tài khoản (US1 & US2)
  │    ├── 1.1. Đăng ký tài khoản thành công [POST /api/v1/users/register]
- │    ├── 1.2. Đăng ký thất bại - Trùng Email [POST /api/v1/users/register]
- │    ├── 1.3. Đăng ký thất bại - Dữ liệu không hợp lệ [POST /api/v1/users/register]
- │    ├── 1.4. Đăng nhập thành công (Lấy JWT) [POST /api/v1/auth/login]
- │    ├── 1.5. Đăng nhập thất bại - Sai mật khẩu [POST /api/v1/auth/login]
- │    ├── 1.6. Đăng nhập thất bại - Email không tồn tại [POST /api/v1/auth/login]
- │    ├── 1.7. Đăng nhập Google thành công [POST /api/v1/auth/google]
- │    └── 1.8. Đăng nhập Google thất bại - Token rác [POST /api/v1/auth/google]
+ │    ├── 1.2. Đăng ký thất bại - Trùng Tên đăng nhập (Username) [POST /api/v1/users/register]
+ │    ├── 1.3. Đăng ký thất bại - Trùng Email [POST /api/v1/users/register]
+ │    ├── 1.4. Đăng ký thất bại - Dữ liệu không hợp lệ [POST /api/v1/users/register]
+ │    ├── 1.5. Đăng nhập thành công bằng Email (Lấy JWT) [POST /api/v1/auth/login]
+ │    ├── 1.6. Đăng nhập thành công bằng Username (Lấy JWT) [POST /api/v1/auth/login]
+ │    ├── 1.7. Đăng nhập thất bại - Sai mật khẩu [POST /api/v1/auth/login]
+ │    ├── 1.8. Đăng nhập thất bại - Tài khoản không tồn tại [POST /api/v1/auth/login]
+ │    ├── 1.9. Đăng nhập Google thành công [POST /api/v1/auth/google]
+ │    └── 1.10. Đăng nhập Google thất bại - Token rác [POST /api/v1/auth/google]
  └── 📂 2. Epic 2: Quản lý Ví (US4 & US5)
       ├── 2.1. Tạo ví mới thành công có số dư [POST /api/v1/wallets]
       ├── 2.2. Tạo ví mới không truyền số dư (Mặc định 0.00) [POST /api/v1/wallets]
@@ -83,6 +85,7 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
 * **Body (raw JSON):**
   ```json
   {
+    "username": "nguyenvana",
     "fullName": "Nguyen Van A",
     "email": "nguyenvana@gmail.com",
     "password": "Password123@"
@@ -96,6 +99,7 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
     "message": "Đăng ký tài khoản thành công",
     "data": {
       "userId": 1,
+      "username": "nguyenvana",
       "fullName": "Nguyen Van A",
       "email": "nguyenvana@gmail.com",
       "createdAt": "2026-11-04T22:15:00",
@@ -117,13 +121,37 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
   });
   ```
 
-#### Request 1.2: Đăng ký thất bại — Trùng Email (US1)
+#### Request 1.2: Đăng ký thất bại — Trùng Tên đăng nhập (US1)
 * **Method:** `POST`
 * **URL:** `{{baseUrl}}/api/v1/users/register`
 * **Headers:** `Content-Type: application/json`
 * **Body (raw JSON):**
   ```json
   {
+    "username": "nguyenvana",
+    "fullName": "Nguyen Van B",
+    "email": "nguyenvanb@gmail.com",
+    "password": "Password123@"
+  }
+  ```
+* **Mã HTTP mong đợi:** `409 Conflict`
+* **Response mẫu:**
+  ```json
+  {
+    "code": 409,
+    "message": "Tên đăng nhập đã được sử dụng",
+    "data": null
+  }
+  ```
+
+#### Request 1.3: Đăng ký thất bại — Trùng Email (US1)
+* **Method:** `POST`
+* **URL:** `{{baseUrl}}/api/v1/users/register`
+* **Headers:** `Content-Type: application/json`
+* **Body (raw JSON):**
+  ```json
+  {
+    "username": "nguyenvanb",
     "fullName": "Nguyen Van A Clone",
     "email": "nguyenvana@gmail.com",
     "password": "Password123@"
@@ -149,13 +177,14 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
   });
   ```
 
-#### Request 1.3: Đăng ký thất bại — Dữ liệu không hợp lệ (US1)
+#### Request 1.4: Đăng ký thất bại — Dữ liệu không hợp lệ (US1)
 * **Method:** `POST`
 * **URL:** `{{baseUrl}}/api/v1/users/register`
 * **Headers:** `Content-Type: application/json`
 * **Body (raw JSON):**
   ```json
   {
+    "username": "a",
     "fullName": "",
     "email": "sai-dinh-dang-email",
     "password": "123"
@@ -166,14 +195,14 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
   ```json
   {
     "code": 400,
-    "message": "Họ và tên không được để trống; Email không đúng định dạng; Mật khẩu phải từ 8 đến 72 ký tự",
+    "message": "Tên đăng nhập phải từ 3 đến 50 ký tự; Họ và tên không được để trống; Email không đúng định dạng; Mật khẩu phải từ 8 đến 72 ký tự",
     "data": null
   }
   ```
 
 ---
 
-#### Request 1.4: Đăng nhập thành công — Lấy JWT Token (US2)
+#### Request 1.5: Đăng nhập thành công bằng Email — Lấy JWT Token (US2)
 * **Method:** `POST`
 * **URL:** `{{baseUrl}}/api/v1/auth/login`
 * **Headers:** `Content-Type: application/json`
@@ -196,6 +225,7 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
       "expiresIn": 86400,
       "user": {
         "userId": 1,
+        "username": "nguyenvana",
         "fullName": "Nguyen Van A",
         "email": "nguyenvana@gmail.com",
         "createdAt": "2026-11-04T22:15:00",
@@ -219,19 +249,33 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
   });
   ```
 
-#### Request 1.5: Đăng nhập thất bại — Sai Mật khẩu (US2)
+#### Request 1.6: Đăng nhập thành công bằng Tên đăng nhập (Username) (US2)
 * **Method:** `POST`
 * **URL:** `{{baseUrl}}/api/v1/auth/login`
 * **Headers:** `Content-Type: application/json`
 * **Body (raw JSON):**
   ```json
   {
-    "email": "nguyenvana@gmail.com",
+    "username": "nguyenvana",
+    "password": "Password123@"
+  }
+  ```
+* **Mã HTTP mong đợi:** `200 OK`
+* **Response mẫu:** Tương tự Request 1.5, trả về `accessToken` và thông tin `user`.
+
+#### Request 1.7: Đăng nhập thất bại — Sai Mật khẩu (US2)
+* **Method:** `POST`
+* **URL:** `{{baseUrl}}/api/v1/auth/login`
+* **Headers:** `Content-Type: application/json`
+* **Body (raw JSON):**
+  ```json
+  {
+    "username": "nguyenvana",
     "password": "SaiMatKhau123@"
   }
   ```
 * **Mã HTTP mong đợi:** `401 Unauthorized`
-* **Response mẫu (Không được tiết lộ sai mật khẩu hay sai email):**
+* **Response mẫu (Không được tiết lộ sai mật khẩu hay sai tài khoản):**
   ```json
   {
     "code": 401,
@@ -240,19 +284,19 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
   }
   ```
 
-#### Request 1.6: Đăng nhập thất bại — Email không tồn tại (US2)
+#### Request 1.8: Đăng nhập thất bại — Tài khoản không tồn tại (US2)
 * **Method:** `POST`
 * **URL:** `{{baseUrl}}/api/v1/auth/login`
 * **Headers:** `Content-Type: application/json`
 * **Body (raw JSON):**
   ```json
   {
-    "email": "khongtontai@gmail.com",
+    "username": "khongtontai",
     "password": "Password123@"
   }
   ```
 * **Mã HTTP mong đợi:** `401 Unauthorized`
-* **Response mẫu (Thông báo lỗi đồng nhất với 1.5):**
+* **Response mẫu (Thông báo lỗi đồng nhất với 1.7):**
   ```json
   {
     "code": 401,
@@ -263,7 +307,7 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
 
 ---
 
-#### Request 1.7: Đăng nhập bằng Google (Google OAuth Login)
+#### Request 1.9: Đăng nhập bằng Google (Google OAuth Login)
 * **Method:** `POST`
 * **URL:** `{{baseUrl}}/api/v1/auth/google`
 * **Headers:** `Content-Type: application/json`
@@ -285,6 +329,7 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
       "expiresIn": 86400,
       "user": {
         "userId": 2,
+        "username": "usergoogle",
         "fullName": "Google Account Name",
         "email": "user.google@gmail.com",
         "createdAt": "2026-11-04T22:20:00",
@@ -294,7 +339,7 @@ Tạo một Environment mới trên Postman đặt tên là: `Expense-Tracker-De
   }
   ```
 
-#### Request 1.8: Đăng nhập Google thất bại — Token rác/không hợp lệ
+#### Request 1.10: Đăng nhập Google thất bại — Token rác/không hợp lệ
 * **Method:** `POST`
 * **URL:** `{{baseUrl}}/api/v1/auth/google`
 * **Headers:** `Content-Type: application/json`

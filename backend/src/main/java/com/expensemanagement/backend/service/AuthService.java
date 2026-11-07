@@ -41,10 +41,15 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        String normalizedEmail = request.getEmail().trim().toLowerCase();
+        String rawIdentifier = request.getIdentifier();
+        if (rawIdentifier == null || rawIdentifier.isBlank()) {
+            throw new UnauthorizedException("Email hoặc mật khẩu không chính xác");
+        }
 
-        // Không tiết lộ email có tồn tại hay không, trả về thông báo lỗi chung
-        User user = userRepository.findByEmail(normalizedEmail)
+        String normalizedIdentifier = rawIdentifier.toLowerCase();
+
+        // Tìm theo Email hoặc Tên đăng nhập (Username)
+        User user = userRepository.findByEmailOrUsername(normalizedIdentifier, normalizedIdentifier)
                 .orElseThrow(() -> new UnauthorizedException("Email hoặc mật khẩu không chính xác"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
@@ -55,6 +60,7 @@ public class AuthService {
 
         UserResponse userResponse = UserResponse.builder()
                 .userId(user.getUserId())
+                .username(user.getUsername())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .createdAt(user.getCreatedAt())
@@ -92,7 +98,17 @@ public class AuthService {
         // Nếu user chưa tồn tại -> tự động tạo tài khoản mới (JIT Provisioning)
         User user = userRepository.findByEmail(normalizedEmail)
                 .orElseGet(() -> {
+                    String baseUsername = normalizedEmail.split("@")[0].replaceAll("[^a-zA-Z0-9_]", "");
+                    if (baseUsername.length() < 3) {
+                        baseUsername = "user_" + baseUsername;
+                    }
+                    String generatedUsername = baseUsername;
+                    if (userRepository.existsByUsername(generatedUsername)) {
+                        generatedUsername = baseUsername + "_" + UUID.randomUUID().toString().substring(0, 5);
+                    }
+
                     User newUser = User.builder()
+                            .username(generatedUsername)
                             .fullName(finalName)
                             .email(normalizedEmail)
                             .passwordHash(passwordEncoder.encode(UUID.randomUUID().toString()))
@@ -104,6 +120,7 @@ public class AuthService {
 
         UserResponse userResponse = UserResponse.builder()
                 .userId(user.getUserId())
+                .username(user.getUsername())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .createdAt(user.getCreatedAt())

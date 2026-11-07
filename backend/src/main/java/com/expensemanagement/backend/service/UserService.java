@@ -27,12 +27,18 @@ public class UserService {
     @Transactional
     public UserResponse register(UserCreationRequest request) {
         String normalizedEmail = request.getEmail().trim().toLowerCase();
+        String normalizedUsername = request.getUsername().trim().toLowerCase();
+
+        if (userRepository.existsByUsername(normalizedUsername)) {
+            throw new DuplicateResourceException("Tên đăng nhập đã được sử dụng");
+        }
 
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new DuplicateResourceException("Email đã được sử dụng");
         }
 
         User user = User.builder()
+                .username(normalizedUsername)
                 .fullName(request.getFullName().trim())
                 .email(normalizedEmail)
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
@@ -59,6 +65,10 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("Không tìm thấy người dùng với ID: " + userId);
@@ -69,6 +79,7 @@ public class UserService {
     public UserResponse mapToUserResponse(User user) {
         return UserResponse.builder()
                 .userId(user.getUserId())
+                .username(user.getUsername())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .createdAt(user.getCreatedAt())

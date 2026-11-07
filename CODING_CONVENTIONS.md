@@ -15,12 +15,12 @@ Tài liệu quy định toàn bộ tiêu chuẩn lập trình, đặt tên, cấ
 | **Tên bảng** | `snake_case`, danh từ số nhiều | `users`, `wallets`, `categories`, `transactions`, `budgets` |
 | **Khóa chính (PK)** | `{singular_table_name}_id` | `user_id`, `wallet_id`, `category_id`, `transaction_id`, `budget_id` |
 | **Khóa ngoại (FK)** | Khớp chính xác tên cột PK được tham chiếu | `user_id`, `wallet_id`, `category_id` |
-| **Tên cột thường** | `snake_case`, danh từ/cụm danh từ | `full_name`, `email`, `wallet_name`, `balance`, `amount` |
+| **Tên cột thường** | `snake_case`, danh từ/cụm danh từ | `username`, `full_name`, `email`, `wallet_name`, `balance`, `amount` |
 | **Cột Boolean** | Tiền tố `is_` hoặc `has_` | `is_active` |
 | **Cột Thời gian** | `DATETIME` hoặc `TIMESTAMP` | `created_at`, `updated_at`, `transaction_date` |
 | **Cột Tiền tệ** | `DECIMAL(15,2)` | `balance`, `amount`, `budget_amount` |
 | **Tên Constraint FK** | `fk_{bảng_chứa}_{bảng_tham_chiếu}` | `fk_wallets_users`, `fk_transactions_wallets` |
-| **Tên Constraint Unique** | `uq_{tên_bảng}_{tên_cột}` | `uq_users_email` |
+| **Tên Constraint Unique** | `uq_{tên_bảng}_{tên_cột}` | `uq_users_username`, `uq_users_email` |
 | **Tên Constraint Check** | `chk_{tên_bảng}_{mục_đích}` | `chk_wallets_balance`, `chk_categories_type` |
 | **Tên Index** | `idx_{tên_bảng}_{các_cột}` | `idx_wallets_user_id`, `idx_transactions_wallet_date` |
 | **Giá trị Enum/Loại** | `UPPER_SNAKE_CASE` (chuỗi hằng số) | `INCOME`, `EXPENSE` |

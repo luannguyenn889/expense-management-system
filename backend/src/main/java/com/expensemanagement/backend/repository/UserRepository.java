@@ -6,11 +6,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-// tuong tac truc tiep voi database
-@Repository // giup spring tao repository
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    // JpaRepository la interface cua spring data jpa,
-    // cung cap cac phuong thuc de tuong tac voi database, nhu save, findById, findAll, deleteById, ...
+
+    Optional<User> findByEmail(String email);
 
     Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmailOrUsername(String email, String username);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByUsername(String username);
 }

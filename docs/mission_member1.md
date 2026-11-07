@@ -44,9 +44,9 @@
 * [ ] Tạo bộ xử lý lỗi tập trung `GlobalExceptionHandler.java` và các Custom Exception (`DuplicateResourceException`, `ResourceNotFoundException`, `UnauthorizedException`).
 
 ### PHẦN III: PHÁT TRIỂN USER STORY US1 — [BE] ĐĂNG KÝ TÀI KHOẢN (3 SP DEV)
-* [ ] Refactor Entity `User` và `UserRepository`: Ánh xạ chuẩn với bảng `users` (`user_id`, `full_name`, `email`, `password_hash`, `created_at`, `updated_at`).
-* [ ] Tạo DTO `UserCreationRequest` (validate `@NotBlank`, `@Email`, `@Size(min=8, max=72)`), `UserResponse` (không lộ password hash).
-* [ ] Xây dựng `UserService.register()`: Chuẩn hóa email, kiểm tra trùng email $\rightarrow$ ném lỗi 409, băm mật khẩu bằng BCrypt (`PasswordEncoder`) trước khi lưu.
+* [ ] Refactor Entity `User` và `UserRepository`: Ánh xạ chuẩn với bảng `users` (`user_id`, `username`, `full_name`, `email`, `password_hash`, `created_at`, `updated_at`).
+* [ ] Tạo DTO `UserCreationRequest` (validate `@NotBlank`, `@Size(min=3, max=50)` cho `username`, `@NotBlank`, `@Email`, `@Size(min=8, max=72)`), `UserResponse` (không lộ password hash, có `username`).
+* [ ] Xây dựng `UserService.register()`: Chuẩn hóa username và email, kiểm tra trùng lặp $\rightarrow$ ném lỗi 409, băm mật khẩu bằng BCrypt (`PasswordEncoder`) trước khi lưu.
 * [ ] Endpoint Controller: `POST /api/v1/users/register`.
 * [ ] **Viết 4 Unit Test bắt buộc (`UserServiceTest.java`):**
   1. `register_withValidData_shouldReturnUserResponse()`

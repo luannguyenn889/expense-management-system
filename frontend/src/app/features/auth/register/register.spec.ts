@@ -22,7 +22,7 @@ describe('Register', () => {
 
     expect(authService.register).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain('Vui lòng nhập họ và tên.');
-    expect(fixture.nativeElement.textContent).toContain('Vui lòng nhập tên đăng nhập.');
+    expect(fixture.nativeElement.textContent).toContain('Vui lòng nhập tên tài khoản.');
     expect(fixture.nativeElement.textContent).toContain('Vui lòng nhập email.');
     expect(fixture.nativeElement.textContent).toContain('Vui lòng nhập mật khẩu.');
     expect(fixture.nativeElement.textContent).toContain('Vui lòng xác nhận mật khẩu.');
@@ -38,7 +38,7 @@ describe('Register', () => {
     const fixture = TestBed.createComponent(Register);
     fixture.detectChanges();
     const inputs = fixture.nativeElement.querySelectorAll('input');
-    const values = ['Nguyen An', 'nguyenan', 'user@example.com', 'password123', 'different123'];
+    const values = ['Nguyen An', 'user@example.com', 'nguyenan', 'password123', 'different123'];
     inputs.forEach((input: HTMLInputElement, index: number) => {
       input.value = values[index];
       input.dispatchEvent(new Event('input'));
@@ -52,12 +52,12 @@ describe('Register', () => {
     expect(fixture.nativeElement.textContent).toContain('Mật khẩu xác nhận không khớp.');
   });
 
-  it('should display success after a valid registration response', async () => {
+  it('should return to login after a successful registration', async () => {
     const authService = { register: vi.fn().mockReturnValue(of({ token: 'test-token' })) };
     await TestBed.configureTestingModule({
       imports: [Register],
       providers: [
-        provideRouter([{ path: 'wallets', children: [] }]),
+        provideRouter([{ path: 'login', children: [] }]),
         { provide: AuthService, useValue: authService },
       ],
     }).compileComponents();
@@ -65,7 +65,7 @@ describe('Register', () => {
     const fixture = TestBed.createComponent(Register);
     fixture.detectChanges();
     const inputs = fixture.nativeElement.querySelectorAll('input');
-    const values = ['Nguyen An', 'nguyenan', 'user@example.com', 'password123', 'password123'];
+    const values = ['Nguyen An', 'user@example.com', 'nguyenan', 'password123', 'password123'];
     inputs.forEach((input: HTMLInputElement, index: number) => {
       input.value = values[index];
       input.dispatchEvent(new Event('input'));
@@ -82,6 +82,6 @@ describe('Register', () => {
       email: 'user@example.com',
       password: 'password123',
     });
-    expect(TestBed.inject(Router).url).toBe('/wallets');
+    expect(TestBed.inject(Router).url).toBe('/login');
   });
 });

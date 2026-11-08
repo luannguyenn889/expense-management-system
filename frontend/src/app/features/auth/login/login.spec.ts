@@ -30,7 +30,7 @@ describe('Login', () => {
     await TestBed.configureTestingModule({
       imports: [Login],
       providers: [
-        provideRouter([{ path: 'wallets', children: [] }]),
+        provideRouter([{ path: 'dashboard', children: [] }]),
         { provide: AuthService, useValue: authService },
       ],
     }).compileComponents();
@@ -52,7 +52,7 @@ describe('Login', () => {
       username: 'minhanh',
       password: 'password123',
     });
-    expect(TestBed.inject(Router).url).toBe('/wallets');
+    expect(TestBed.inject(Router).url).toBe('/dashboard');
   });
 
   it('should show an API error after a rejected sign-in', async () => {
@@ -79,10 +79,13 @@ describe('Login', () => {
     expect(fixture.nativeElement.textContent).toContain('Thông tin đăng nhập không đúng.');
   });
 
-  it('should explain that Google sign-in is unavailable until backend OAuth is configured', async () => {
+  it('should show notice when Google sign-in service is not yet loaded', async () => {
     await TestBed.configureTestingModule({
       imports: [Login],
-      providers: [provideRouter([]), { provide: AuthService, useValue: { login: vi.fn() } }],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: { login: vi.fn(), loginWithGoogle: vi.fn() } },
+      ],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(Login);
@@ -90,11 +93,35 @@ describe('Login', () => {
     fixture.nativeElement.querySelector('.social-login-button').click();
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.social-login-button').textContent.trim()).toBe(
-      'G',
-    );
+    expect(
+      fixture.nativeElement.querySelector('.social-login-button').textContent.trim(),
+    ).toBe('G Tiếp tục với Google');
     expect(fixture.nativeElement.textContent).toContain(
-      'Đăng nhập Google chưa khả dụng: backend OAuth chưa được tích hợp.',
+      'Dịch vụ Google Sign-In chưa sẵn sàng hoặc bị chặn. Vui lòng thử lại sau.',
     );
+  });
+
+  it('should authenticate with Google credential and navigate to dashboard', async () => {
+    const authService = {
+      login: vi.fn(),
+      loginWithGoogle: vi.fn().mockReturnValue(of({ token: 'test-google-token' })),
+    };
+    await TestBed.configureTestingModule({
+      imports: [Login],
+      providers: [
+        provideRouter([{ path: 'dashboard', children: [] }]),
+        { provide: AuthService, useValue: authService },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(Login);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    component.handleGoogleCredential('sample-google-id-token');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(authService.loginWithGoogle).toHaveBeenCalledWith('sample-google-id-token');
+    expect(TestBed.inject(Router).url).toBe('/dashboard');
   });
 });

@@ -1,50 +1,42 @@
 <main class="auth-page">
-  <div class="register-layout">
-    <aside class="app-intro" aria-labelledby="app-intro-title">
-      <a
-        class="brand"
-        routerLink="/login"
-        aria-label="Ví Của Tôi - trang đăng nhập"
-      >
-        <span class="brand-mark" aria-hidden="true">v.</span>
-        <span>ví của tôi</span>
+  <div class="auth-brand">
+    <a class="brand" routerLink="/login" aria-label="WealthWise - trang đăng nhập">
+      <span class="brand-mark" aria-hidden="true">W</span>
+      <span>WealthWise</span>
+    </a>
+    <p>Quản lý chi tiêu cá nhân</p>
+  </div>
+
+  <section class="auth-card register-card" aria-label="Đăng ký tài khoản">
+    <nav class="auth-tabs" aria-label="Tài khoản">
+      <a class="auth-tab" routerLink="/login">
+        <span class="material-symbols-outlined" aria-hidden="true">login</span>
+        Đăng nhập
       </a>
+      <a class="auth-tab active" routerLink="/register" aria-current="page">
+        <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+        Đăng ký
+      </a>
+    </nav>
 
-      <div class="intro-copy">
-        <p class="eyebrow">QUẢN LÝ TÀI CHÍNH CÁ NHÂN</p>
-        <h1 id="app-intro-title">Chi tiêu rõ ràng, an tâm mỗi ngày.</h1>
-        <p class="intro-description">
-          Ví Của Tôi giúp bạn theo dõi các khoản thu chi và quản lý ví cá nhân
-          dễ dàng hơn.
-        </p>
+    <a class="social-login-button google-button" routerLink="/login">
+      <span class="google-mark" aria-hidden="true">G</span>
+      Tiếp tục với Google
+    </a>
 
-        <ul class="intro-benefits">
-          <li>Theo dõi số dư các ví của bạn</li>
-          <li>Ghi nhận thu nhập và chi tiêu</li>
-          <li>Nắm bắt kế hoạch ngân sách</li>
-        </ul>
-      </div>
+    <div class="auth-divider"><span>HOẶC ĐĂNG KÝ VỚI EMAIL</span></div>
+    @if (errorMessage()) {
+      <p class="form-alert" role="alert">{{ errorMessage() }}</p>
+    }
 
-      <p class="intro-note">
-        Bắt đầu từ những thói quen nhỏ để làm chủ tài chính của bạn.
-      </p>
-    </aside>
-
-    <section class="auth-card" aria-label="Đăng ký tài khoản">
-      <h2 class="register-title">Tạo tài khoản</h2>
-
-      @if (errorMessage()) {
-        <p class="form-alert" role="alert">{{ errorMessage() }}</p>
-      }
-
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
         <label class="field">
           <span>Họ và tên</span>
           <input
             formControlName="fullName"
             type="text"
             autocomplete="name"
-            placeholder="Nguyễn Minh Anh"
+            placeholder="Nguyễn Văn A"
             [attr.aria-invalid]="
               registerForm.controls.fullName.invalid && registerForm.controls.fullName.touched
             "
@@ -58,16 +50,36 @@
             registerForm.controls.fullName.touched &&
             registerForm.controls.fullName.hasError('pattern')
           ) {
-            <small class="field-error">
-              Họ và tên không được chỉ chứa khoảng trắng.
-            </small>
+            <small class="field-error">Họ và tên không được chỉ chứa khoảng trắng.</small>
           } @else if (
             registerForm.controls.fullName.touched &&
             registerForm.controls.fullName.hasError('maxlength')
           ) {
-            <small class="field-error">
-              Họ và tên không được vượt quá 100 ký tự.
-            </small>
+            <small class="field-error">Họ và tên không được vượt quá 100 ký tự.</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            placeholder="nguyen.vana@example.com"
+            [attr.aria-invalid]="
+              registerForm.controls.email.invalid && registerForm.controls.email.touched
+            "
+          />
+          @if (
+            registerForm.controls.email.touched &&
+            registerForm.controls.email.hasError('required')
+          ) {
+            <small class="field-error">Vui lòng nhập email.</small>
+          } @else if (
+            registerForm.controls.email.touched &&
+            registerForm.controls.email.hasError('email')
+          ) {
+            <small class="field-error">Email chưa đúng định dạng.</small>
           }
         </label>
 
@@ -94,33 +106,7 @@
               registerForm.controls.username.hasError('maxlength')
             )
           ) {
-            <small class="field-error">
-              Tên đăng nhập phải có từ 3 đến 30 ký tự.
-            </small>
-          }
-        </label>
-
-        <label class="field">
-          <span>Email</span>
-          <input
-            formControlName="email"
-            type="email"
-            autocomplete="email"
-            placeholder="ban@email.com"
-            [attr.aria-invalid]="
-              registerForm.controls.email.invalid && registerForm.controls.email.touched
-            "
-          />
-          @if (
-            registerForm.controls.email.touched &&
-            registerForm.controls.email.hasError('required')
-          ) {
-            <small class="field-error">Vui lòng nhập email.</small>
-          } @else if (
-            registerForm.controls.email.touched &&
-            registerForm.controls.email.hasError('email')
-          ) {
-            <small class="field-error">Email chưa đúng định dạng.</small>
+            <small class="field-error">Tên tài khoản phải có từ 3 đến 30 ký tự.</small>
           }
         </label>
 
@@ -175,10 +161,15 @@
         </button>
       </form>
 
-      <p class="auth-footer">
-        Đã có tài khoản?
-        <a routerLink="/login">Đăng nhập</a>
-      </p>
-    </section>
-  </div>
+    <p class="auth-footer">
+      Đã có tài khoản?
+      <a routerLink="/login">Đăng nhập</a>
+    </p>
+  </section>
+
+  <footer class="auth-legal">
+    © 2024 WealthWise. Tất cả các quyền được bảo lưu.
+    <span>•</span> Điều khoản sử dụng <span>•</span> Chính sách bảo mật
+    <span>•</span> Hỗ trợ
+  </footer>
 </main>

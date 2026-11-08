@@ -1,34 +1,54 @@
 <main class="auth-page">
-  <section class="auth-card" aria-labelledby="login-title">
-    <a
-      class="brand"
-      routerLink="/login"
-      aria-label="Ví Của Tôi - trang đăng nhập"
-    >
-      <span class="brand-mark" aria-hidden="true">v.</span>
-      <span>ví của tôi</span>
+  <div class="auth-brand">
+    <a class="brand" routerLink="/login" aria-label="Ví Của Tôi - trang đăng nhập">
+      <span class="brand-mark" aria-hidden="true">W</span>
+      <span>WealthWise</span>
     </a>
+    <p>Quản lý chi tiêu cá nhân</p>
+  </div>
 
-    <div class="auth-heading">
-      <p class="eyebrow">CHÀO MỪNG TRỞ LẠI</p>
-      <h1 id="login-title">Đăng nhập</h1>
-      <p class="auth-description">
-        Đăng nhập để quản lý ví và theo dõi chi tiêu của bạn.
-      </p>
-    </div>
+  <section class="auth-card" aria-labelledby="login-title">
+    <nav class="auth-tabs" aria-label="Tài khoản">
+      <a class="auth-tab active" routerLink="/login" aria-current="page">
+        <span class="material-symbols-outlined" aria-hidden="true">login</span>
+        Đăng nhập
+      </a>
+      <a class="auth-tab" routerLink="/register">
+        <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+        Đăng ký
+      </a>
+    </nav>
+
+    <h1 id="login-title" class="visually-hidden">Đăng nhập</h1>
 
     @if (errorMessage()) {
       <p class="form-alert" role="alert">{{ errorMessage() }}</p>
     }
 
+    <div class="social-login-actions" aria-label="Đăng nhập bằng mạng xã hội">
+      <button
+        class="social-login-button google-button"
+        type="button"
+        aria-label="Tiếp tục với Google"
+        title="Đăng nhập bằng Google"
+        [disabled]="isLoading()"
+        (click)="onGoogleLogin()"
+      >
+        <span class="google-mark" aria-hidden="true">G</span>
+        Tiếp tục với Google
+      </button>
+    </div>
+
+    <div class="auth-divider"><span>HOẶC EMAIL</span></div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
       <label class="field">
-        <span>Tên đăng nhập</span>
+        <span>Email hoặc tên đăng nhập</span>
         <input
           formControlName="username"
           type="text"
           autocomplete="username"
-          placeholder="Tên đăng nhập hoặc email"
+          placeholder="Email hoặc tên đăng nhập"
           [attr.aria-invalid]="
             loginForm.controls.username.invalid && loginForm.controls.username.touched
           "
@@ -46,13 +66,16 @@
           )
         ) {
           <small class="field-error">
-            Tên đăng nhập phải có từ 3 đến 30 ký tự.
+            Tên đăng nhập hoặc email phải có từ 3 đến 255 ký tự.
           </small>
         }
       </label>
 
       <label class="field">
-        <span>Mật khẩu</span>
+        <span class="field-label-row">
+          Mật khẩu
+          <span class="quiet-link">Quên mật khẩu?</span>
+        </span>
         <input
           formControlName="password"
           type="password"
@@ -75,32 +98,30 @@
         }
       </label>
 
+      <label class="remember-option">
+        <input type="checkbox" />
+        <span>Ghi nhớ đăng nhập</span>
+      </label>
+
       <button class="primary-button" type="submit" [disabled]="isLoading()">
         {{ isLoading() ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+        <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
       </button>
     </form>
 
-    <div class="auth-divider" aria-hidden="true">
-      <span>hoặc</span>
-    </div>
-    <div class="social-login-actions" aria-label="Đăng nhập bằng mạng xã hội">
-      <button
-        class="social-login-button google-button"
-        type="button"
-        aria-label="Đăng nhập bằng Google"
-        title="Đăng nhập bằng Google"
-        (click)="onGoogleLogin()"
-      >
-        <span class="google-mark" aria-hidden="true">G</span>
-      </button>
-    </div>
     @if (googleLoginMessage()) {
       <p class="form-alert" role="status">{{ googleLoginMessage() }}</p>
     }
 
     <p class="auth-footer">
       Chưa có tài khoản?
-      <a routerLink="/register">Tạo tài khoản</a>
+      <a routerLink="/register">Đăng ký tài khoản</a>
     </p>
   </section>
+
+  <footer class="auth-legal">
+    © 2024 WealthWise. Tất cả các quyền được bảo lưu.
+    <span>•</span> Điều khoản sử dụng <span>•</span> Chính sách bảo mật
+    <span>•</span> Hỗ trợ
+  </footer>
 </main>

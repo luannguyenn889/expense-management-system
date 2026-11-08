@@ -81,7 +81,7 @@ export class Register {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: () => void this.router.navigateByUrl('/wallets'),
+        next: () => void this.router.navigateByUrl('/login'),
         error: (error: unknown) =>
           this.errorMessage.set(
             getErrorMessage(error, 'Đăng ký thất bại. Vui lòng thử lại.'),

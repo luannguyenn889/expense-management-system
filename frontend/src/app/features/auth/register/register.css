@@ -172,3 +172,12 @@
   place-items: center;
   text-decoration: none;
 }
+
+.register-card form {
+  display: grid;
+  gap: 0;
+}
+
+.register-card .auth-footer {
+  margin-top: 14px;
+}

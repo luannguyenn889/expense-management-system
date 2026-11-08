@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO nhận dữ liệu yêu cầu đăng ký tài khoản mới (US1 - CNTT46-37).
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,6 +25,7 @@ public class UserCreationRequest {
 
     @NotBlank(message = "Họ và tên không được để trống")
     @Size(max = 100, message = "Họ và tên tối đa 100 ký tự")
+    @Pattern(regexp = "^[\\p{L}\\s]+$", message = "Họ và tên chỉ được chứa chữ cái và khoảng trắng, không chứa số hoặc ký tự đặc biệt")
     private String fullName;
 
     @NotBlank(message = "Email không được để trống")

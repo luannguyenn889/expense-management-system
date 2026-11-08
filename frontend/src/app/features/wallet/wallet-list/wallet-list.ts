@@ -8,26 +8,23 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Wallet } from '../../../core/models/wallet.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { WalletService } from '../../../core/services/wallet.service';
 import { getErrorMessage } from '../../../core/utils/error-message.util';
+import { getWalletTypeIcon, getWalletTypeLabel } from '../../../core/utils/wallet-type.util';
 import { CurrencyVndPipe } from '../../../shared/pipes/currency-vnd.pipe';
 import { WalletCreateForm } from '../wallet-create-form/wallet-create-form';
 
 @Component({
   selector: 'app-wallet-list',
-  imports: [CurrencyVndPipe, RouterLink, WalletCreateForm],
+  imports: [CurrencyVndPipe, WalletCreateForm],
   templateUrl: './wallet-list.html',
   styleUrl: './wallet-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WalletList implements OnInit {
   private readonly walletService = inject(WalletService);
-  private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly wallets = signal<Wallet[]>([]);
@@ -36,6 +33,8 @@ export class WalletList implements OnInit {
   protected readonly totalBalance = computed(() =>
     this.wallets().reduce((total, wallet) => total + wallet.balance, 0),
   );
+  protected readonly walletTypeIcon = getWalletTypeIcon;
+  protected readonly walletTypeLabel = getWalletTypeLabel;
 
   ngOnInit(): void {
     this.loadWallets();
@@ -59,10 +58,5 @@ export class WalletList implements OnInit {
 
   protected onWalletCreated(): void {
     this.loadWallets();
-  }
-
-  protected onLogout(): void {
-    this.authService.logout();
-    void this.router.navigateByUrl('/login');
   }
 }

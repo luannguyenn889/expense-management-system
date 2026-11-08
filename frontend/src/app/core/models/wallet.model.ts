@@ -11,4 +11,5 @@ export interface Wallet {
 export interface WalletCreateRequest {
   walletName: string;
   balance: number;
+  walletType: WalletType;
 }

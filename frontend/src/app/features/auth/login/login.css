@@ -170,3 +170,33 @@
     transition: none;
   }
 }
+
+.auth-card {
+  animation: login-card-enter 350ms ease-out both;
+}
+
+.social-login-button:focus-visible,
+.auth-tab:focus-visible,
+.remember-option input:focus-visible {
+  outline: 3px solid rgb(40 100 232 / 25%);
+  outline-offset: 2px;
+}
+
+.social-login-button {
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.auth-card .field input:focus-visible,
+.primary-button:focus-visible,
+.auth-footer a:focus-visible,
+.brand:focus-visible {
+  outline: 3px solid rgb(40 100 232 / 25%);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-card {
+    animation: none;
+  }
+}

@@ -1,0 +1,127 @@
+<section class="dashboard-page">
+  <header class="dashboard-heading">
+    <div>
+      <p class="dashboard-eyebrow">TỔNG QUAN TÀI CHÍNH</p>
+      <h1>Xin chào, chào mừng trở lại <span aria-hidden="true">👋</span></h1>
+      <p class="dashboard-date">
+        <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
+        {{ today }}
+      </p>
+    </div>
+    <a class="dashboard-action" routerLink="/wallets">
+      <span class="material-symbols-outlined" aria-hidden="true">add</span>
+      Thêm ví mới
+    </a>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="dashboard-error" role="alert">
+      <span>{{ errorMessage() }}</span>
+      <button type="button" (click)="loadWallets()">Thử lại</button>
+    </div>
+  }
+
+  <section class="summary-grid" aria-label="Tóm tắt tài chính">
+    <article class="summary-card balance-card">
+      <div class="summary-topline">
+        <span>TỔNG SỐ DƯ KHẢ DỤNG</span>
+        <span class="summary-icon blue-icon material-symbols-outlined" aria-hidden="true">
+          account_balance_wallet
+        </span>
+      </div>
+      @if (isLoading()) {
+        <p class="summary-value skeleton-text" aria-label="Đang tải">Đang tải...</p>
+      } @else {
+        <p class="summary-value">{{ totalBalance() | currencyVnd }}</p>
+      }
+      <span class="summary-footnote">
+        {{ isLoading() ? 'Đang đồng bộ ví' : 'Tổng số dư từ các ví đang quản lý' }}
+      </span>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-topline">
+        <span>SỐ VÍ ĐANG QUẢN LÝ</span>
+        <span class="summary-icon green-icon material-symbols-outlined" aria-hidden="true">
+          savings
+        </span>
+      </div>
+      <p class="summary-value">{{ isLoading() ? '—' : wallets().length }}</p>
+      <span class="summary-footnote">Ví cá nhân của bạn</span>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-topline">
+        <span>VÍ ĐANG HOẠT ĐỘNG</span>
+        <span class="summary-icon violet-icon material-symbols-outlined" aria-hidden="true">
+          verified
+        </span>
+      </div>
+      <p class="summary-value">{{ isLoading() ? '—' : activeWalletCount() }}</p>
+      <span class="summary-footnote">Sẵn sàng sử dụng</span>
+    </article>
+  </section>
+
+  <div class="dashboard-columns">
+    <section class="dashboard-panel wallets-preview" aria-labelledby="dashboard-wallets-title">
+      <div class="panel-title-row">
+        <div>
+          <h2 id="dashboard-wallets-title">Ví của bạn</h2>
+          <p>Các nguồn tiền đang được quản lý</p>
+        </div>
+        <a routerLink="/wallets">
+          Quản lý ví
+          <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+        </a>
+      </div>
+
+      @if (isLoading()) {
+        <div class="dashboard-empty" role="status">Đang tải danh sách ví...</div>
+      } @else if (errorMessage()) {
+        <div class="dashboard-empty">Dữ liệu ví chưa thể hiển thị.</div>
+      } @else if (wallets().length === 0) {
+        <div class="dashboard-empty">
+          <span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>
+          <strong>Chưa có ví nào</strong>
+          <span>Tạo ví đầu tiên để bắt đầu theo dõi số dư.</span>
+          <a routerLink="/wallets">Tạo ví mới</a>
+        </div>
+      } @else {
+        <ul class="dashboard-wallet-list">
+          @for (wallet of wallets().slice(0, 4); track wallet.walletId) {
+            <li>
+              <span class="wallet-list-icon material-symbols-outlined" aria-hidden="true">
+                {{ walletTypeIcon(wallet.walletType) }}
+              </span>
+              <span class="wallet-list-copy">
+                <strong>{{ wallet.walletName }}</strong>
+                <small>
+                  {{ walletTypeLabel(wallet.walletType) }} ·
+                  {{ wallet.isActive === false ? 'Đã tạm ngưng' : 'Đang hoạt động' }}
+                </small>
+              </span>
+              <strong class="wallet-list-balance">{{ wallet.balance | currencyVnd }}</strong>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="dashboard-panel transactions-preview" aria-labelledby="recent-transactions-title">
+      <div class="panel-title-row">
+        <div>
+          <h2 id="recent-transactions-title">Giao dịch gần đây</h2>
+          <p>Hoạt động thu chi mới nhất</p>
+        </div>
+        <span class="coming-soon">Sắp ra mắt</span>
+      </div>
+      <div class="transaction-empty">
+        <span class="transaction-empty-icon material-symbols-outlined" aria-hidden="true">
+          receipt_long
+        </span>
+        <strong>Chưa có giao dịch</strong>
+        <p>Tính năng ghi nhận và theo dõi giao dịch sẽ sớm có mặt.</p>
+      </div>
+    </section>
+  </div>
+</section>

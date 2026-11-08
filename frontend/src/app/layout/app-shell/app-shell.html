@@ -1,0 +1,101 @@
+<div class="workspace">
+  <aside class="sidebar" aria-label="Điều hướng chính">
+    <a class="brand" routerLink="/dashboard">
+      <span class="brand-mark" aria-hidden="true">W</span>
+      <span>WealthWise</span>
+    </a>
+
+    <nav class="side-nav">
+      <p class="nav-caption">TỔNG QUAN</p>
+      <a
+        class="nav-link"
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">space_dashboard</span>
+        <span>Tổng quan</span>
+      </a>
+      <button class="nav-link nav-link-muted" type="button" disabled title="Sắp ra mắt">
+        <span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>
+        <span>Sổ giao dịch</span>
+      </button>
+      <a class="nav-link" routerLink="/wallets" routerLinkActive="active">
+        <span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>
+        <span>Quản lý ví</span>
+      </a>
+      <button class="nav-link nav-link-muted" type="button" disabled title="Sắp ra mắt">
+        <span class="material-symbols-outlined" aria-hidden="true">category</span>
+        <span>Danh mục</span>
+      </button>
+      <button class="nav-link nav-link-muted" type="button" disabled title="Sắp ra mắt">
+        <span class="material-symbols-outlined" aria-hidden="true">savings</span>
+        <span>Hạn mức chi tiêu</span>
+      </button>
+      <button class="nav-link nav-link-muted" type="button" disabled title="Sắp ra mắt">
+        <span class="material-symbols-outlined" aria-hidden="true">flag</span>
+        <span>Mục tiêu tiết kiệm</span>
+      </button>
+      <button class="nav-link nav-link-muted" type="button" disabled title="Sắp ra mắt">
+        <span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>
+        <span>Báo cáo &amp; thống kê</span>
+      </button>
+
+      <p class="nav-caption nav-caption-settings">TÀI KHOẢN</p>
+      <button class="nav-link nav-link-muted" type="button" disabled title="Sắp ra mắt">
+        <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+        <span>Cài đặt tài khoản</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="profile-summary">
+        <span class="profile-avatar material-symbols-outlined" aria-hidden="true">account_circle</span>
+        <span class="profile-copy">
+          <strong>{{ fullName }}</strong>
+          <small>WealthWise</small>
+        </span>
+      </div>
+      <button class="logout-button" type="button" (click)="onLogout()">
+        <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+        Đăng xuất
+      </button>
+    </div>
+  </aside>
+
+  <div class="workspace-main">
+    <header class="topbar">
+      <label class="global-search">
+        <span class="material-symbols-outlined" aria-hidden="true">search</span>
+        <input type="search" placeholder="Tìm kiếm giao dịch, ví, báo cáo..." disabled />
+      </label>
+
+      <div class="topbar-actions">
+        <button class="period-button" type="button" disabled>
+          <span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>
+          Tháng này
+          <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+        </button>
+        <button class="icon-button notification-button" type="button" disabled aria-label="Thông báo">
+          <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+        </button>
+        <a class="topbar-primary" routerLink="/wallets">
+          <span class="material-symbols-outlined" aria-hidden="true">add</span>
+          Thêm ví mới
+        </a>
+      </div>
+    </header>
+
+    <main class="workspace-content">
+      <router-outlet />
+    </main>
+
+    <footer class="workspace-footer">
+      <span>© 2024 WealthWise. Quản lý chi tiêu cá nhân thông minh.</span>
+      <span class="system-status">
+        <span aria-hidden="true"></span>
+        Hệ thống hoạt động bình thường
+      </span>
+    </footer>
+  </div>
+</div>

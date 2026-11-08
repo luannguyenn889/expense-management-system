@@ -31,7 +31,7 @@ export class Login implements OnInit {
   protected readonly errorMessage = signal('');
   protected readonly googleLoginMessage = signal('');
   protected readonly loginForm = this.formBuilder.nonNullable.group({
-    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
@@ -55,7 +55,7 @@ export class Login implements OnInit {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: () => void this.router.navigateByUrl('/wallets'),
+        next: () => void this.router.navigateByUrl('/dashboard'),
         error: (error: unknown) =>
           this.errorMessage.set(
             getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng thử lại.'),
@@ -97,7 +97,7 @@ export class Login implements OnInit {
       .subscribe({
         next: () => {
           this.googleLoginMessage.set('');
-          void this.router.navigateByUrl('/wallets');
+          void this.router.navigateByUrl('/dashboard');
         },
         error: (error: unknown) =>
           this.googleLoginMessage.set(

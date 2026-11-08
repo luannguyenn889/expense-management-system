@@ -12,10 +12,22 @@ export const routes: Routes = [
       import('./features/auth/register/register').then((module) => module.Register),
   },
   {
-    path: 'wallets',
+    path: '',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/wallet/wallet-list/wallet-list').then((module) => module.WalletList),
+    loadComponent: () => import('./layout/app-shell/app-shell').then((module) => module.AppShell),
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard').then((module) => module.Dashboard),
+      },
+      {
+        path: 'wallets',
+        loadComponent: () =>
+          import('./features/wallet/wallet-list/wallet-list').then((module) => module.WalletList),
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+    ],
   },
   { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: '**', redirectTo: 'login' },

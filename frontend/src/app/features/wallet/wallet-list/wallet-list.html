@@ -30,11 +30,10 @@
       <div class="panel-heading">
         <div>
           <h2 id="wallet-list-title">Danh sách ví</h2>
-          <p>Nhấp vào số dư để theo dõi từng ví</p>
+          <p>Quản lý trạng thái và số dư từng ví</p>
         </div>
         <span class="wallet-count">{{ wallets().length }}</span>
       </div>
-
       @if (isLoading()) {
         <div class="loading-state" role="status">
           <span class="loading-indicator" aria-hidden="true"></span>
@@ -68,6 +67,28 @@
                 </span>
               </div>
               <strong class="wallet-balance">{{ wallet.balance | currencyVnd }}</strong>
+              <div class="wallet-actions" [attr.aria-label]="'Thao tác với ' + wallet.walletName">
+                @if (wallet.isActive !== false) {
+                  <button
+                    class="wallet-action-button"
+                    type="button"
+                    [attr.aria-label]="'Ngừng sử dụng ' + wallet.walletName"
+                    (click)="openWalletAction(wallet, 'deactivate')"
+                  >
+                    <span class="material-symbols-outlined" aria-hidden="true">pause_circle</span>
+                    <span>Ngừng sử dụng</span>
+                  </button>
+                }
+                <button
+                  class="wallet-action-button wallet-delete-button"
+                  type="button"
+                  [attr.aria-label]="'Xóa ' + wallet.walletName"
+                  (click)="openWalletAction(wallet, 'delete')"
+                >
+                  <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                  <span>Xóa</span>
+                </button>
+              </div>
             </li>
           }
         </ul>
@@ -76,4 +97,69 @@
 
     <app-wallet-create-form (walletCreated)="onWalletCreated()" />
   </div>
+
+  @if (pendingWalletAction(); as pending) {
+    <div class="wallet-dialog-backdrop" (click)="closeWalletAction()">
+      <section
+        class="wallet-action-dialog"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-labelledby]="'wallet-action-title'"
+        (click)="$event.stopPropagation()"
+      >
+        <span
+          class="wallet-dialog-icon material-symbols-outlined"
+          [class.wallet-dialog-icon-danger]="pending.action === 'delete'"
+          aria-hidden="true"
+        >
+          {{ pending.action === 'delete' ? 'delete' : 'pause_circle' }}
+        </span>
+        <h2 id="wallet-action-title">
+          {{ pending.action === 'delete' ? 'Xóa ví?' : 'Ngừng sử dụng ví?' }}
+        </h2>
+        <p class="wallet-dialog-wallet-name">{{ pending.wallet.walletName }}</p>
+        @if (pending.action === 'deactivate') {
+          <p>
+            Ví sẽ được chuyển sang trạng thái ngừng hoạt động. Số dư và lịch sử giao dịch vẫn được
+            giữ nguyên.
+          </p>
+        } @else {
+          <p>
+            Thao tác này sẽ xóa ví khỏi tài khoản. Dữ liệu số dư và lịch sử liên quan có thể bị ảnh
+            hưởng.
+          </p>
+        }
+        @if (walletActionError()) {
+          <p class="wallet-dialog-error" role="alert">{{ walletActionError() }}</p>
+        }
+        <div class="wallet-dialog-actions">
+          <button
+            class="wallet-dialog-close"
+            type="button"
+            [disabled]="isWalletActionLoading()"
+            (click)="closeWalletAction()"
+          >
+            Đóng
+          </button>
+          <button
+            class="wallet-dialog-confirm"
+            [class.wallet-dialog-confirm-danger]="pending.action === 'delete'"
+            type="button"
+            [disabled]="isWalletActionLoading()"
+            (click)="confirmWalletAction()"
+          >
+            @if (isWalletActionLoading()) {
+              <span class="material-symbols-outlined" aria-hidden="true">progress_activity</span>
+              Đang xử lý...
+            } @else {
+              <span class="material-symbols-outlined" aria-hidden="true">
+                {{ pending.action === 'delete' ? 'delete' : 'pause_circle' }}
+              </span>
+              {{ pending.action === 'delete' ? 'Xóa ví' : 'Ngừng sử dụng' }}
+            }
+          </button>
+        </div>
+      </section>
+    </div>
+  }
 </section>

@@ -22,7 +22,7 @@ export class WalletCreateForm {
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal('');
   protected readonly walletForm = this.formBuilder.nonNullable.group({
-    walletName: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(60)]],
+    walletName: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
     balance: [0, [Validators.required, Validators.min(0)]],
   });
 

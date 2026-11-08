@@ -21,6 +21,14 @@ export class WalletService {
       .post<ApiResponse<Wallet>>(`${this.apiUrl}/wallets`, request)
       .pipe(map(unwrapApiResponse));
   }
+
+  deactivateWallet(walletId: number): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/wallets/${walletId}`, { isActive: false });
+  }
+
+  deleteWallet(walletId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/wallets/${walletId}`);
+  }
 }
 
 Injectable({ providedIn: 'root' })(WalletService);

@@ -13,7 +13,7 @@ export class AppShell {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly fullName = this.authService.getFullName();
+  protected readonly profile = this.authService.profile;
 
   protected onLogout(): void {
     this.authService.logout();

@@ -32,7 +32,7 @@
   max-width: 480px;
   margin: 0;
   color: #1d3125;
-  font: 800 clamp(36px, 4.5vw, 58px) / 1.12 'Manrope', sans-serif;
+  font: 800 clamp(36px, 4.5vw, 58px) / 1.12 'Be Vietnam Pro', sans-serif;
   letter-spacing: -1.8px;
 }
 
@@ -83,7 +83,7 @@
 .register-title {
   margin: 0 0 24px;
   color: #1d3125;
-  font: 800 26px / 1.25 'Manrope', sans-serif;
+  font: 800 26px / 1.25 'Be Vietnam Pro', sans-serif;
   letter-spacing: -0.5px;
 }
 
@@ -180,4 +180,42 @@
 
 .register-card .auth-footer {
   margin-top: 14px;
+}
+
+.password-input-wrap {
+  position: relative;
+}
+
+.register-card .password-input-wrap input {
+  padding-right: 42px;
+}
+
+.password-visibility-toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  transform: translateY(-50%);
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.password-visibility-toggle:hover {
+  background: #f0f3f9;
+  color: #2864e8;
+}
+
+.password-visibility-toggle:focus-visible {
+  outline: 2px solid #3673ed;
+  outline-offset: 1px;
+}
+
+.password-visibility-toggle .material-symbols-outlined {
+  font-size: 19px;
 }

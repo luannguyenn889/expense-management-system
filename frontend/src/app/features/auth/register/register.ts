@@ -26,6 +26,16 @@ const passwordsMatchValidator: ValidatorFn = (
     : null;
 };
 
+const fullNamePattern = /^[\p{L}\p{M}]+(?:\s+[\p{L}\p{M}]+)*$/u;
+const usernamePattern = /^[A-Za-z0-9_]+$/;
+const fullNameValidator: ValidatorFn = (control) => {
+  const fullName = typeof control.value === 'string' ? control.value.trim() : '';
+  if (!fullName) {
+    return { required: true };
+  }
+  return fullNamePattern.test(fullName) ? null : { fullNamePattern: true };
+};
+
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule, RouterLink],
@@ -41,12 +51,29 @@ export class Register {
 
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly isPasswordVisible = signal(false);
+  protected readonly isConfirmPasswordVisible = signal(false);
   protected readonly registerForm = this.formBuilder.nonNullable.group(
     {
-      fullName: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      fullName: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(100),
+          fullNameValidator,
+        ],
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(50),
+          Validators.pattern(usernamePattern),
+        ],
+      ],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
       confirmPassword: ['', Validators.required],
     },
     { validators: passwordsMatchValidator },
@@ -62,12 +89,17 @@ export class Register {
 
   protected onSubmit(): void {
     this.errorMessage.set('');
+    const fullName = this.registerForm.controls.fullName.value.trim();
+    const username = this.registerForm.controls.username.value.trim();
+    const email = this.registerForm.controls.email.value.trim().toLowerCase();
+    this.registerForm.patchValue({ fullName, username, email });
+
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
 
-    const { fullName, username, email, password } = this.registerForm.getRawValue();
+    const { password } = this.registerForm.getRawValue();
     this.isLoading.set(true);
     this.authService
       .register({
@@ -81,7 +113,7 @@ export class Register {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: () => void this.router.navigateByUrl('/login'),
+        next: () => void this.router.navigateByUrl('/dashboard'),
         error: (error: unknown) =>
           this.errorMessage.set(
             getErrorMessage(error, 'Đăng ký thất bại. Vui lòng thử lại.'),

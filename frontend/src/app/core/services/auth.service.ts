@@ -1,8 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { map, Observable, tap } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { map, Observable, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { TOKEN_STORAGE_KEY, USER_FULL_NAME_STORAGE_KEY } from '../constants/auth.constants';
+import {
+  TOKEN_STORAGE_KEY,
+  USER_FULL_NAME_STORAGE_KEY,
+  USERNAME_STORAGE_KEY,
+} from '../constants/auth.constants';
 import { ApiResponse } from '../models/api-response.model';
 import {
   AuthSession,
@@ -17,11 +21,23 @@ import { unwrapApiResponse } from '../utils/api-response.util';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
+  readonly profile = signal({
+    fullName: sessionStorage.getItem(USER_FULL_NAME_STORAGE_KEY)?.trim() || 'Người dùng',
+    username: sessionStorage.getItem(USERNAME_STORAGE_KEY)?.trim() || '',
+  });
 
-  register(request: UserCreationRequest): Observable<UserResponse> {
+  register(request: UserCreationRequest): Observable<AuthSession> {
     return this.http
       .post<ApiResponse<UserResponse>>(`${this.apiUrl}/users/register`, request)
-      .pipe(map(unwrapApiResponse));
+      .pipe(
+        map(unwrapApiResponse),
+        switchMap(() =>
+          this.login({
+            username: request.username,
+            password: request.password,
+          }),
+        ),
+      );
   }
 
   login(request: LoginRequest): Observable<AuthSession> {
@@ -49,7 +65,21 @@ export class AuthService {
   }
 
   getFullName(): string {
-    return sessionStorage.getItem(USER_FULL_NAME_STORAGE_KEY)?.trim() || 'Người dùng';
+    return this.profile().fullName;
+  }
+
+  getUsername(): string {
+    return this.profile().username;
+  }
+
+  updateProfileLocally(profile: { fullName: string; username: string }): void {
+    const updatedProfile = {
+      fullName: profile.fullName.trim(),
+      username: profile.username.trim(),
+    };
+    sessionStorage.setItem(USER_FULL_NAME_STORAGE_KEY, updatedProfile.fullName);
+    sessionStorage.setItem(USERNAME_STORAGE_KEY, updatedProfile.username);
+    this.profile.set(updatedProfile);
   }
 
   isAuthenticated(): boolean {
@@ -59,6 +89,8 @@ export class AuthService {
   logout(): void {
     sessionStorage.removeItem(TOKEN_STORAGE_KEY);
     sessionStorage.removeItem(USER_FULL_NAME_STORAGE_KEY);
+    sessionStorage.removeItem(USERNAME_STORAGE_KEY);
+    this.profile.set({ fullName: 'Người dùng', username: '' });
   }
 
   private storeSession(session: AuthSession): void {
@@ -72,6 +104,17 @@ export class AuthService {
     } else {
       sessionStorage.removeItem(USER_FULL_NAME_STORAGE_KEY);
     }
+
+    const username = session.user?.username?.trim();
+    if (username) {
+      sessionStorage.setItem(USERNAME_STORAGE_KEY, username);
+    } else {
+      sessionStorage.removeItem(USERNAME_STORAGE_KEY);
+    }
+    this.profile.set({
+      fullName: fullName || 'Người dùng',
+      username: username || '',
+    });
   }
 
   private requireToken(session: AuthSession): AuthSession {

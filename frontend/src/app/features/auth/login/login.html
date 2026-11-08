@@ -65,9 +65,7 @@
             loginForm.controls.username.hasError('maxlength')
           )
         ) {
-          <small class="field-error">
-            Tên đăng nhập hoặc email phải có từ 3 đến 255 ký tự.
-          </small>
+          <small class="field-error">Tên đăng nhập hoặc email không được vượt quá 255 ký tự.</small>
         }
       </label>
 
@@ -80,6 +78,7 @@
           formControlName="password"
           type="password"
           autocomplete="current-password"
+          maxlength="72"
           placeholder="Ít nhất 8 ký tự"
           [attr.aria-invalid]="
             loginForm.controls.password.invalid && loginForm.controls.password.touched
@@ -95,6 +94,11 @@
           loginForm.controls.password.hasError('minlength')
         ) {
           <small class="field-error">Mật khẩu phải có ít nhất 8 ký tự.</small>
+        } @else if (
+          loginForm.controls.password.touched &&
+          loginForm.controls.password.hasError('maxlength')
+        ) {
+          <small class="field-error">Mật khẩu không được vượt quá 72 ký tự.</small>
         }
       </label>
 

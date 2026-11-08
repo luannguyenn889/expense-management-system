@@ -1,0 +1,224 @@
+<section class="profile-page">
+  <header class="profile-heading">
+    <div>
+      <p class="profile-eyebrow">TÀI KHOẢN</p>
+      <h1>Hồ sơ cá nhân</h1>
+      <p>Quản lý thông tin hiển thị trên tài khoản WealthWise của bạn.</p>
+    </div>
+    <span class="profile-heading-icon material-symbols-outlined" aria-hidden="true">account_circle</span>
+  </header>
+
+  <section class="profile-card" aria-labelledby="profile-form-title">
+    <nav class="profile-tabs" aria-label="Cài đặt hồ sơ">
+      <button
+        type="button"
+        [class.active]="activeTab() === 'details'"
+        [attr.aria-current]="activeTab() === 'details' ? 'page' : null"
+        (click)="selectTab('details')"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">person</span>
+        Thông tin tài khoản
+      </button>
+      <button
+        type="button"
+        [class.active]="activeTab() === 'password'"
+        [attr.aria-current]="activeTab() === 'password' ? 'page' : null"
+        (click)="selectTab('password')"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">lock</span>
+        Đổi mật khẩu
+      </button>
+    </nav>
+
+    @if (successMessage()) {
+      <p class="profile-success" role="status">
+        <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
+        {{ successMessage() }}
+      </p>
+    }
+
+    @if (activeTab() === 'details') {
+      <div class="profile-card-heading">
+        <span class="profile-card-icon material-symbols-outlined" aria-hidden="true">person</span>
+        <div>
+          <h2 id="profile-form-title">Thông tin tài khoản</h2>
+          <p>Chỉnh sửa họ tên và tên tài khoản của bạn.</p>
+        </div>
+      </div>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onSave()" novalidate>
+      <label class="profile-field" for="profile-full-name">
+        <span>Họ và tên</span>
+        <input
+          id="profile-full-name"
+          formControlName="fullName"
+          type="text"
+          autocomplete="name"
+          placeholder="Nguyễn Văn A"
+          [attr.aria-invalid]="
+            profileForm.controls.fullName.invalid && profileForm.controls.fullName.touched
+          "
+        />
+        @if (
+          profileForm.controls.fullName.touched &&
+          profileForm.controls.fullName.hasError('required')
+        ) {
+          <small class="profile-field-error">Vui lòng nhập họ và tên.</small>
+        } @else if (
+          profileForm.controls.fullName.touched &&
+          profileForm.controls.fullName.hasError('pattern')
+        ) {
+          <small class="profile-field-error">Họ và tên không được để trống.</small>
+        } @else if (
+          profileForm.controls.fullName.touched &&
+          profileForm.controls.fullName.hasError('maxlength')
+        ) {
+          <small class="profile-field-error">Họ và tên không được vượt quá 100 ký tự.</small>
+        }
+      </label>
+
+      <label class="profile-field" for="profile-username">
+        <span>Tên đăng nhập</span>
+        <input
+          id="profile-username"
+          formControlName="username"
+          type="text"
+          autocomplete="username"
+          placeholder="Tên đăng nhập"
+          [attr.aria-invalid]="
+            profileForm.controls.username.invalid && profileForm.controls.username.touched
+          "
+        />
+        @if (
+          profileForm.controls.username.touched &&
+          profileForm.controls.username.hasError('required')
+        ) {
+          <small class="profile-field-error">Vui lòng nhập tên đăng nhập.</small>
+        } @else if (
+          profileForm.controls.username.touched &&
+          profileForm.controls.username.hasError('pattern')
+        ) {
+          <small class="profile-field-error">Tên đăng nhập không được để trống.</small>
+        } @else if (
+          profileForm.controls.username.touched &&
+          profileForm.controls.username.hasError('maxlength')
+        ) {
+          <small class="profile-field-error">Tên đăng nhập không được vượt quá 50 ký tự.</small>
+        }
+      </label>
+
+      <p class="profile-backend-note">
+        <span class="material-symbols-outlined" aria-hidden="true">info</span>
+        Thay đổi hiện được lưu tạm trong phiên trình duyệt này. Đồng bộ với backend sẽ được bổ sung
+        sau.
+      </p>
+
+      <div class="profile-actions">
+        <button class="profile-cancel" type="button" (click)="onCancel()">Hủy</button>
+        <button class="profile-save" type="submit">
+          <span class="material-symbols-outlined" aria-hidden="true">save</span>
+          Lưu thay đổi
+        </button>
+      </div>
+      </form>
+    } @else {
+      <div class="profile-card-heading">
+        <span class="profile-card-icon material-symbols-outlined" aria-hidden="true">lock</span>
+        <div>
+          <h2 id="profile-form-title">Đổi mật khẩu</h2>
+          <p>Chọn mật khẩu mới để bảo vệ tài khoản của bạn.</p>
+        </div>
+      </div>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" novalidate>
+        <label class="profile-field" for="profile-current-password">
+          <span>Mật khẩu hiện tại</span>
+          <input
+            id="profile-current-password"
+            formControlName="currentPassword"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Nhập mật khẩu hiện tại"
+            [attr.aria-invalid]="
+              passwordForm.controls.currentPassword.invalid &&
+              passwordForm.controls.currentPassword.touched
+            "
+          />
+          @if (
+            passwordForm.controls.currentPassword.touched &&
+            passwordForm.controls.currentPassword.hasError('required')
+          ) {
+            <small class="profile-field-error">Vui lòng nhập mật khẩu hiện tại.</small>
+          }
+        </label>
+
+        <label class="profile-field" for="profile-new-password">
+          <span>Mật khẩu mới</span>
+          <input
+            id="profile-new-password"
+            formControlName="newPassword"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Ít nhất 8 ký tự"
+            [attr.aria-invalid]="
+              passwordForm.controls.newPassword.invalid && passwordForm.controls.newPassword.touched
+            "
+          />
+          @if (
+            passwordForm.controls.newPassword.touched &&
+            passwordForm.controls.newPassword.hasError('required')
+          ) {
+            <small class="profile-field-error">Vui lòng nhập mật khẩu mới.</small>
+          } @else if (
+            passwordForm.controls.newPassword.touched &&
+            passwordForm.controls.newPassword.hasError('minlength')
+          ) {
+            <small class="profile-field-error">Mật khẩu mới phải có ít nhất 8 ký tự.</small>
+          }
+        </label>
+
+        <label class="profile-field" for="profile-confirm-password">
+          <span>Xác nhận mật khẩu mới</span>
+          <input
+            id="profile-confirm-password"
+            formControlName="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Nhập lại mật khẩu mới"
+            [attr.aria-invalid]="
+              (passwordForm.controls.confirmPassword.invalid ||
+                passwordForm.hasError('passwordMismatch')) &&
+              passwordForm.controls.confirmPassword.touched
+            "
+          />
+          @if (
+            passwordForm.controls.confirmPassword.touched &&
+            passwordForm.controls.confirmPassword.hasError('required')
+          ) {
+            <small class="profile-field-error">Vui lòng xác nhận mật khẩu mới.</small>
+          } @else if (
+            passwordForm.controls.confirmPassword.touched &&
+            passwordForm.hasError('passwordMismatch')
+          ) {
+            <small class="profile-field-error">Mật khẩu xác nhận không khớp.</small>
+          }
+        </label>
+
+        <p class="profile-backend-note">
+          <span class="material-symbols-outlined" aria-hidden="true">info</span>
+          Mật khẩu chưa được gửi hoặc thay đổi. Chức năng này sẽ được kết nối khi backend hoàn thiện.
+        </p>
+
+        <div class="profile-actions">
+          <button class="profile-cancel" type="button" (click)="onCancelPasswordChange()">
+            Hủy
+          </button>
+          <button class="profile-save" type="submit">
+            <span class="material-symbols-outlined" aria-hidden="true">lock_reset</span>
+            Đổi mật khẩu
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+</section>

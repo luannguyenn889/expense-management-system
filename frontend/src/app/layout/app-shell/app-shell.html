@@ -49,13 +49,18 @@
     </nav>
 
     <div class="sidebar-bottom">
-      <div class="profile-summary">
+      <a
+        class="profile-summary"
+        routerLink="/profile"
+        routerLinkActive="profile-summary-active"
+        aria-label="Mở hồ sơ người dùng"
+      >
         <span class="profile-avatar material-symbols-outlined" aria-hidden="true">account_circle</span>
         <span class="profile-copy">
-          <strong>{{ fullName }}</strong>
+          <strong>{{ profile().fullName }}</strong>
           <small>WealthWise</small>
         </span>
-      </div>
+      </a>
       <button class="logout-button" type="button" (click)="onLogout()">
         <span class="material-symbols-outlined" aria-hidden="true">logout</span>
         Đăng xuất

@@ -29,7 +29,7 @@
 
 .dashboard-heading h1 {
   margin: 0;
-  font: 750 clamp(21px, 2.5vw, 29px) / 1.25 'Manrope', sans-serif;
+  font: 750 clamp(21px, 2.5vw, 29px) / 1.25 'Be Vietnam Pro', sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -89,7 +89,7 @@
   background: transparent;
   color: #9c3932;
   cursor: pointer;
-  font: 700 12px 'DM Sans', sans-serif;
+  font: 700 12px 'Be Vietnam Pro', sans-serif;
 }
 
 .summary-grid {
@@ -150,7 +150,7 @@
   overflow: hidden;
   margin: 11px 0 4px;
   color: #192338;
-  font: 800 clamp(20px, 2.5vw, 27px) / 1.2 'Manrope', sans-serif;
+  font: 800 clamp(20px, 2.5vw, 27px) / 1.2 'Be Vietnam Pro', sans-serif;
   letter-spacing: -0.8px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -184,7 +184,7 @@
 
 .panel-title-row h2 {
   margin: 0;
-  font: 700 14px 'Manrope', sans-serif;
+  font: 700 14px 'Be Vietnam Pro', sans-serif;
 }
 
 .panel-title-row p {

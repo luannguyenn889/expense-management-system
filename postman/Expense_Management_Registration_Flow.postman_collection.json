@@ -1,0 +1,431 @@
+{
+	"info": {
+		"_postman_id": "c1f7a28e-8a2b-4e1b-9d4f-d09f7a93a123",
+		"name": "Expense Management - Luồng Đăng Ký (CNTT46-37)",
+		"description": "Bộ kiểm thử tự động API luồng Đăng ký tài khoản (US1 - CNTT46-37)\n- Hỗ trợ username, email, mật khẩu và xác nhận mật khẩu\n- Kiểm thử đầy đủ Happy Path và các trường hợp biên/ngoại lệ (400, 409)\n- Chạy được liên tục không lo trùng lặp dữ liệu nhờ biến ngẫu nhiên",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Đăng ký thành công (Happy Path)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomSuffix = Math.floor(Math.random() * 100000);",
+							"pm.variables.set(\"dynUsername\", \"user_\" + randomSuffix);",
+							"pm.variables.set(\"dynEmail\", \"user_\" + randomSuffix + \"@gmail.com\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Kiểm tra chuẩn ApiResponse và dữ liệu User trả về\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(201);",
+							"    pm.expect(jsonData.message).to.eql(\"Đăng ký thành công\");",
+							"    pm.expect(jsonData.data).to.be.an(\"object\");",
+							"    pm.expect(jsonData.data.userId).to.be.a(\"number\");",
+							"    pm.expect(jsonData.data.username).to.eql(pm.variables.get(\"dynUsername\"));",
+							"    pm.expect(jsonData.data.email).to.eql(pm.variables.get(\"dynEmail\"));",
+							"    pm.expect(jsonData.data.fullName).to.eql(\"Nguyễn Văn Đăng Ký\");",
+							"    pm.expect(jsonData.data.password).to.be.undefined;",
+							"    pm.expect(jsonData.data.passwordHash).to.be.undefined;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"{{dynUsername}}\",\n  \"fullName\": \"Nguyễn Văn Đăng Ký\",\n  \"email\": \"{{dynEmail}}\",\n  \"password\": \"Password123@\",\n  \"confirmPassword\": \"Password123@\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				},
+				"description": "Đăng ký tài khoản mới hợp lệ. Tự động sinh username và email ngẫu nhiên để có thể chạy test runner liên tục."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Đăng ký thất bại - Trùng Tên đăng nhập (409 Conflict)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409 Conflict\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							"",
+							"pm.test(\"Thông báo lỗi đúng cho trùng username\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(409);",
+							"    pm.expect(jsonData.message).to.eql(\"Tên đăng nhập đã được sử dụng\");",
+							"    pm.expect(jsonData.data).to.be.null;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"nguyenvana\",\n  \"fullName\": \"Người Dùng Thử Trùng\",\n  \"email\": \"unique_email_{{$timestamp}}@gmail.com\",\n  \"password\": \"Password123@\",\n  \"confirmPassword\": \"Password123@\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				},
+				"description": "Gửi yêu cầu đăng ký với username đã tồn tại trong CSDL (nguyenvana). Backend phải phản hồi 409 Conflict."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Đăng ký thất bại - Trùng Email (409 Conflict)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409 Conflict\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							"",
+							"pm.test(\"Thông báo lỗi đúng cho trùng email\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(409);",
+							"    pm.expect(jsonData.message).to.eql(\"Email đã được sử dụng\");",
+							"    pm.expect(jsonData.data).to.be.null;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"unique_user_{{$timestamp}}\",\n  \"fullName\": \"Người Dùng Trùng Email\",\n  \"email\": \"nguyenvana@gmail.com\",\n  \"password\": \"Password123@\",\n  \"confirmPassword\": \"Password123@\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				},
+				"description": "Gửi yêu cầu đăng ký với email đã tồn tại trong CSDL (nguyenvana@gmail.com). Backend phải phản hồi 409 Conflict."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Đăng ký thất bại - Mật khẩu xác nhận không khớp (400 Bad Request)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Thông báo lỗi không khớp mật khẩu xác nhận\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(400);",
+							"    pm.expect(jsonData.message).to.eql(\"Mật khẩu xác nhận không khớp\");",
+							"    pm.expect(jsonData.data).to.be.null;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"mismatch_pass_{{$timestamp}}\",\n  \"fullName\": \"Kiểm Tra Mật Khẩu Khác\",\n  \"email\": \"mismatch_{{$timestamp}}@gmail.com\",\n  \"password\": \"Password123@\",\n  \"confirmPassword\": \"Password999@\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				},
+				"description": "Mật khẩu (password) và mật khẩu xác nhận (confirmPassword) khác nhau."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Đăng ký thất bại - Bỏ trống toàn bộ các trường (400 Bad Request)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Báo lỗi validation khi để trống\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(400);",
+							"    pm.expect(jsonData.message).to.be.a(\"string\");",
+							"    pm.expect(jsonData.message.length).to.be.above(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"\",\n  \"fullName\": \"\",\n  \"email\": \"\",\n  \"password\": \"\",\n  \"confirmPassword\": \"\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				},
+				"description": "Kiểm tra cơ chế @NotBlank validation ở backend."
+			},
+			"response": []
+		},
+		{
+			"name": "6. Đăng ký thất bại - Email sai định dạng (400 Bad Request)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Báo lỗi email không đúng định dạng\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(400);",
+							"    pm.expect(jsonData.message).to.include(\"Email không đúng định dạng\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"valid_user_{{$timestamp}}\",\n  \"fullName\": \"Người Dùng Sai Email\",\n  \"email\": \"dinh_dang_email_khong_hop_le\",\n  \"password\": \"Password123@\",\n  \"confirmPassword\": \"Password123@\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				},
+				"description": "Kiểm tra annotation @Email."
+			},
+			"response": []
+		},
+		{
+			"name": "7. Đăng ký thất bại - Username quá ngắn hoặc ký tự đặc biệt (400 Bad Request)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Báo lỗi username không hợp lệ\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(400);",
+							"    pm.expect(jsonData.message).to.be.a(\"string\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"u!\",\n  \"fullName\": \"Người Dùng Sai Username\",\n  \"email\": \"test_user_{{$timestamp}}@gmail.com\",\n  \"password\": \"Password123@\",\n  \"confirmPassword\": \"Password123@\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				},
+				"description": "Kiểm tra annotation @Size(min=3) và @Pattern cho username."
+			},
+			"response": []
+		},
+		{
+			"name": "8. Đăng ký thất bại - Mật khẩu ngắn dưới 8 ký tự (400 Bad Request)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Báo lỗi mật khẩu không đủ độ dài\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(400);",
+							"    pm.expect(jsonData.message).to.include(\"Mật khẩu phải từ 8 đến 72 ký tự\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"shortpass_{{$timestamp}}\",\n  \"fullName\": \"Người Dùng Mật Khẩu Ngắn\",\n  \"email\": \"shortpass_{{$timestamp}}@gmail.com\",\n  \"password\": \"12345\",\n  \"confirmPassword\": \"12345\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				},
+				"description": "Kiểm tra annotation @Size(min=8) cho password."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}

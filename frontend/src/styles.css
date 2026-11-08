@@ -207,6 +207,7 @@ a {
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
+  font-feature-settings: 'liga';
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
   font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
@@ -429,7 +430,7 @@ a {
 
 .social-login-button .google-mark {
   color: #4285f4;
-  font: 800 16px Arial, sans-serif;
+  font: 800 16px 'Be Vietnam Pro', sans-serif;
 }
 
 .auth-footer {

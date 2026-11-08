@@ -130,7 +130,11 @@ describe('Login', () => {
 
     expect(
       fixture.nativeElement.querySelector('.social-login-button').textContent.trim(),
-    ).toBe('G Tiếp tục với Google');
+    ).toBe('Tiếp tục với Google');
+    expect(fixture.nativeElement.querySelector('.google-mark path[fill="#4285F4"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.google-mark path[fill="#34A853"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.google-mark path[fill="#FBBC05"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.google-mark path[fill="#EA4335"]')).not.toBeNull();
     expect(fixture.nativeElement.textContent).toContain(
       'Dịch vụ Google Sign-In chưa sẵn sàng hoặc bị chặn. Vui lòng thử lại sau.',
     );

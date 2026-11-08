@@ -69,9 +69,12 @@
   border-radius: 50%;
   background: #dcefe2;
   color: #20754b;
-  content: '✓';
+  content: 'check';
+  font-feature-settings: 'liga';
+  font-family: 'Material Symbols Outlined';
   font-size: 13px;
-  font-weight: 700;
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 20;
+  -webkit-font-feature-settings: 'liga';
 }
 
 .intro-note {

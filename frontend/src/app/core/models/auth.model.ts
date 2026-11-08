@@ -3,11 +3,25 @@ export interface UserCreationRequest {
   username: string;
   email: string;
   password: string;
+  confirmPassword?: string;
+}
+
+export interface UserResponse {
+  userId: number;
+  fullName: string;
+  username: string;
+  email: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LoginRequest {
   username: string;
   password: string;
+}
+
+export interface GoogleLoginRequest {
+  idToken: string;
 }
 
 export interface AuthenticatedUser {
@@ -18,6 +32,9 @@ export interface AuthenticatedUser {
 }
 
 export interface AuthSession {
-  token: string;
+  accessToken?: string;
+  token?: string;
+  tokenType?: string;
+  expiresIn?: number;
   user?: AuthenticatedUser;
 }

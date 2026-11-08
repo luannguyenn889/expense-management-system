@@ -32,7 +32,7 @@
   max-width: 480px;
   margin: 0;
   color: #1d3125;
-  font: 800 clamp(36px, 4.5vw, 58px) / 1.12 'Manrope', sans-serif;
+  font: 800 clamp(36px, 4.5vw, 58px) / 1.12 'Be Vietnam Pro', sans-serif;
   letter-spacing: -1.8px;
 }
 
@@ -83,7 +83,7 @@
 .register-title {
   margin: 0 0 24px;
   color: #1d3125;
-  font: 800 26px / 1.25 'Manrope', sans-serif;
+  font: 800 26px / 1.25 'Be Vietnam Pro', sans-serif;
   letter-spacing: -0.5px;
 }
 

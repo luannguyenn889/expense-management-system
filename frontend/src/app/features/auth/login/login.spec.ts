@@ -91,8 +91,12 @@ describe('Login', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('.social-login-button').textContent.trim()).toBe(
-      'G',
+      '',
     );
+    expect(fixture.nativeElement.querySelector('.google-mark path[fill="#4285F4"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.google-mark path[fill="#34A853"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.google-mark path[fill="#FBBC05"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.google-mark path[fill="#EA4335"]')).not.toBeNull();
     expect(fixture.nativeElement.textContent).toContain(
       'Đăng nhập Google chưa khả dụng: backend OAuth chưa được tích hợp.',
     );

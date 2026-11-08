@@ -113,9 +113,10 @@
 }
 
 .google-mark {
-  color: #4285f4;
-  font-size: 18px;
-  font-weight: 700;
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
 }
 
 .auth-card .field input:focus-visible,

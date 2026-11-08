@@ -79,10 +79,13 @@ describe('Login', () => {
     expect(fixture.nativeElement.textContent).toContain('Thông tin đăng nhập không đúng.');
   });
 
-  it('should explain that Google sign-in is unavailable until backend OAuth is configured', async () => {
+  it('should show notice when Google sign-in service is not yet loaded', async () => {
     await TestBed.configureTestingModule({
       imports: [Login],
-      providers: [provideRouter([]), { provide: AuthService, useValue: { login: vi.fn() } }],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: { login: vi.fn(), loginWithGoogle: vi.fn() } },
+      ],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(Login);
@@ -94,7 +97,31 @@ describe('Login', () => {
       'G',
     );
     expect(fixture.nativeElement.textContent).toContain(
-      'Đăng nhập Google chưa khả dụng: backend OAuth chưa được tích hợp.',
+      'Dịch vụ Google Sign-In chưa sẵn sàng hoặc bị chặn. Vui lòng thử lại sau.',
     );
+  });
+
+  it('should authenticate with Google credential and navigate to wallets', async () => {
+    const authService = {
+      login: vi.fn(),
+      loginWithGoogle: vi.fn().mockReturnValue(of({ token: 'test-google-token' })),
+    };
+    await TestBed.configureTestingModule({
+      imports: [Login],
+      providers: [
+        provideRouter([{ path: 'wallets', children: [] }]),
+        { provide: AuthService, useValue: authService },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(Login);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    component.handleGoogleCredential('sample-google-id-token');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(authService.loginWithGoogle).toHaveBeenCalledWith('sample-google-id-token');
+    expect(TestBed.inject(Router).url).toBe('/wallets');
   });
 });

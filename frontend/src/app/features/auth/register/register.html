@@ -19,12 +19,6 @@
       </a>
     </nav>
 
-    <a class="social-login-button google-button" routerLink="/login">
-      <span class="google-mark" aria-hidden="true">G</span>
-      Tiếp tục với Google
-    </a>
-
-    <div class="auth-divider"><span>HOẶC ĐĂNG KÝ VỚI EMAIL</span></div>
     @if (errorMessage()) {
       <p class="form-alert" role="alert">{{ errorMessage() }}</p>
     }
@@ -48,9 +42,9 @@
             <small class="field-error">Vui lòng nhập họ và tên.</small>
           } @else if (
             registerForm.controls.fullName.touched &&
-            registerForm.controls.fullName.hasError('pattern')
+            registerForm.controls.fullName.hasError('fullNamePattern')
           ) {
-            <small class="field-error">Họ và tên không được chỉ chứa khoảng trắng.</small>
+            <small class="field-error">Họ và tên chỉ được chứa chữ cái và khoảng trắng.</small>
           } @else if (
             registerForm.controls.fullName.touched &&
             registerForm.controls.fullName.hasError('maxlength')
@@ -80,6 +74,11 @@
             registerForm.controls.email.hasError('email')
           ) {
             <small class="field-error">Email chưa đúng định dạng.</small>
+          } @else if (
+            registerForm.controls.email.touched &&
+            registerForm.controls.email.hasError('maxlength')
+          ) {
+            <small class="field-error">Email không được vượt quá 255 ký tự.</small>
           }
         </label>
 
@@ -106,21 +105,43 @@
               registerForm.controls.username.hasError('maxlength')
             )
           ) {
-            <small class="field-error">Tên tài khoản phải có từ 3 đến 30 ký tự.</small>
+            <small class="field-error">Tên tài khoản phải có từ 3 đến 50 ký tự.</small>
+          } @else if (
+            registerForm.controls.username.touched &&
+            registerForm.controls.username.hasError('pattern')
+          ) {
+            <small class="field-error">
+              Tên tài khoản chỉ được chứa chữ cái không dấu, chữ số và dấu gạch dưới.
+            </small>
           }
         </label>
 
-        <label class="field">
-          <span>Mật khẩu</span>
-          <input
-            formControlName="password"
-            type="password"
-            autocomplete="new-password"
-            placeholder="Ít nhất 8 ký tự"
-            [attr.aria-invalid]="
-              registerForm.controls.password.invalid && registerForm.controls.password.touched
-            "
-          />
+        <div class="field">
+          <label for="register-password">Mật khẩu</label>
+          <div class="password-input-wrap">
+            <input
+              id="register-password"
+              formControlName="password"
+              [type]="isPasswordVisible() ? 'text' : 'password'"
+              autocomplete="new-password"
+              maxlength="72"
+              placeholder="Ít nhất 8 ký tự"
+              [attr.aria-invalid]="
+                registerForm.controls.password.invalid && registerForm.controls.password.touched
+              "
+            />
+            <button
+              class="password-visibility-toggle"
+              type="button"
+              [attr.aria-label]="isPasswordVisible() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+              [attr.aria-pressed]="isPasswordVisible()"
+              (click)="isPasswordVisible.update((visible) => !visible)"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">
+                {{ isPasswordVisible() ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
           @if (
             registerForm.controls.password.touched &&
             registerForm.controls.password.hasError('required')
@@ -131,18 +152,40 @@
             registerForm.controls.password.hasError('minlength')
           ) {
             <small class="field-error">Mật khẩu phải có ít nhất 8 ký tự.</small>
+          } @else if (
+            registerForm.controls.password.touched &&
+            registerForm.controls.password.hasError('maxlength')
+          ) {
+            <small class="field-error">Mật khẩu không được vượt quá 72 ký tự.</small>
           }
-        </label>
+        </div>
 
-        <label class="field">
-          <span>Xác nhận mật khẩu</span>
-          <input
-            formControlName="confirmPassword"
-            type="password"
-            autocomplete="new-password"
-            placeholder="Nhập lại mật khẩu"
-            [attr.aria-invalid]="isConfirmPasswordInvalid"
-          />
+        <div class="field">
+          <label for="register-confirm-password">Xác nhận mật khẩu</label>
+          <div class="password-input-wrap">
+            <input
+              id="register-confirm-password"
+              formControlName="confirmPassword"
+              [type]="isConfirmPasswordVisible() ? 'text' : 'password'"
+              autocomplete="new-password"
+              maxlength="72"
+              placeholder="Nhập lại mật khẩu"
+              [attr.aria-invalid]="isConfirmPasswordInvalid"
+            />
+            <button
+              class="password-visibility-toggle"
+              type="button"
+              [attr.aria-label]="
+                isConfirmPasswordVisible() ? 'Ẩn xác nhận mật khẩu' : 'Hiện xác nhận mật khẩu'
+              "
+              [attr.aria-pressed]="isConfirmPasswordVisible()"
+              (click)="isConfirmPasswordVisible.update((visible) => !visible)"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">
+                {{ isConfirmPasswordVisible() ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
           @if (
             registerForm.controls.confirmPassword.touched &&
             registerForm.controls.confirmPassword.hasError('required')
@@ -154,7 +197,7 @@
           ) {
             <small class="field-error">Mật khẩu xác nhận không khớp.</small>
           }
-        </label>
+        </div>
 
         <button class="primary-button" type="submit" [disabled]="isLoading()">
           {{ isLoading() ? 'Đang đăng ký...' : 'Đăng ký' }}

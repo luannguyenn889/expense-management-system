@@ -26,6 +26,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/wallet/wallet-list/wallet-list').then((module) => module.WalletList),
       },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile').then((module) => module.Profile),
+      },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],
   },

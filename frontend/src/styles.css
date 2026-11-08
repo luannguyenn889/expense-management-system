@@ -1,8 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-
 :root {
   color-scheme: light;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   color: #17241f;
   background: #f5f7f4;
   font-synthesis: none;
@@ -57,7 +55,7 @@ a {
   align-items: center;
   gap: 10px;
   color: #1d3125;
-  font: 800 20px 'Manrope', sans-serif;
+  font: 800 20px 'Be Vietnam Pro', sans-serif;
   text-decoration: none;
 }
 
@@ -85,7 +83,7 @@ a {
 
 .auth-heading h1 {
   margin: 0;
-  font: 800 30px 'Manrope', sans-serif;
+  font: 800 30px 'Be Vietnam Pro', sans-serif;
   letter-spacing: -1px;
 }
 
@@ -239,7 +237,7 @@ a {
   flex-direction: column;
   gap: 8px;
   color: #161d2a;
-  font: 800 18px 'Manrope', sans-serif;
+  font: 800 18px 'Be Vietnam Pro', sans-serif;
 }
 
 .auth-brand .brand-mark {
@@ -248,7 +246,7 @@ a {
   border-radius: 10px;
   background: #2864e8;
   box-shadow: none;
-  font: 800 16px 'Manrope', sans-serif;
+  font: 800 16px 'Be Vietnam Pro', sans-serif;
 }
 
 .auth-brand > p {
@@ -415,7 +413,7 @@ a {
   background: #fff;
   color: #293448;
   cursor: pointer;
-  font: 500 11px 'DM Sans', sans-serif;
+  font: 500 11px 'Be Vietnam Pro', sans-serif;
   text-decoration: none;
 }
 

@@ -1,0 +1,258 @@
+:host {
+  display: block;
+}
+
+.profile-page {
+  display: grid;
+  max-width: 860px;
+  gap: 22px;
+  margin: 0 auto;
+  color: #1b2435;
+}
+
+.profile-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-eyebrow {
+  margin: 0 0 5px;
+  color: #7181a0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.15px;
+}
+
+.profile-heading h1 {
+  margin: 0;
+  font: 750 clamp(22px, 2.5vw, 29px) / 1.25 'Be Vietnam Pro', sans-serif;
+}
+
+.profile-heading p:last-child {
+  margin: 7px 0 0;
+  color: #78849a;
+  font-size: 12px;
+}
+
+.profile-heading-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 15px;
+  background: #edf3ff;
+  color: #4774c4;
+  font-size: 30px;
+}
+
+.profile-card {
+  padding: clamp(18px, 4vw, 30px);
+  border: 1px solid #ebedf3;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgb(40 51 77 / 3%);
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eff1f5;
+}
+
+.profile-tabs button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #68758a;
+  cursor: pointer;
+  font: 600 11px 'Be Vietnam Pro', sans-serif;
+}
+
+.profile-tabs button:hover {
+  background: #f5f7fa;
+  color: #34445f;
+}
+
+.profile-tabs button.active {
+  border-color: #dce6fa;
+  background: #edf3ff;
+  color: #2864e8;
+}
+
+.profile-tabs .material-symbols-outlined {
+  font-size: 17px;
+}
+
+.profile-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eff1f5;
+}
+
+.profile-card-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: #edf3ff;
+  color: #4774c4;
+  font-size: 21px;
+}
+
+.profile-card-heading h2 {
+  margin: 0;
+  color: #273248;
+  font: 700 15px 'Be Vietnam Pro', sans-serif;
+}
+
+.profile-card-heading p {
+  margin: 4px 0 0;
+  color: #8791a4;
+  font-size: 11px;
+}
+
+.profile-card form {
+  display: grid;
+  gap: 18px;
+  padding-top: 20px;
+}
+
+.profile-field {
+  display: grid;
+  gap: 7px;
+  color: #43506a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.profile-field input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #dfe4ed;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: #273248;
+  font: 12px 'Be Vietnam Pro', sans-serif;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.profile-field input:focus {
+  border-color: #6a92e7;
+  box-shadow: 0 0 0 3px rgb(40 100 232 / 10%);
+}
+
+.profile-field input[aria-invalid='true'] {
+  border-color: #d45d55;
+}
+
+.profile-field-error {
+  color: #b42318;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.profile-backend-note,
+.profile-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.profile-backend-note {
+  background: #f5f7fa;
+  color: #68758a;
+}
+
+.profile-success {
+  margin-top: 18px;
+  border: 1px solid #d6ebdd;
+  background: #f3fbf5;
+  color: #275b3b;
+}
+
+.profile-backend-note .material-symbols-outlined,
+.profile-success .material-symbols-outlined {
+  flex: 0 0 auto;
+  font-size: 16px;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 2px;
+}
+
+.profile-actions button {
+  display: inline-flex;
+  min-height: 37px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 13px;
+  border: 1px solid #dfe4ed;
+  border-radius: 8px;
+  cursor: pointer;
+  font: 600 11px 'Be Vietnam Pro', sans-serif;
+}
+
+.profile-cancel {
+  background: #fff;
+  color: #59677e;
+}
+
+.profile-cancel:hover {
+  background: #f5f7fa;
+}
+
+.profile-save {
+  border-color: #2864e8 !important;
+  background: #2864e8;
+  color: #fff;
+}
+
+.profile-save:hover {
+  border-color: #1d55d8 !important;
+  background: #1d55d8;
+}
+
+.profile-save .material-symbols-outlined {
+  font-size: 16px;
+}
+
+@media (max-width: 520px) {
+  .profile-tabs button {
+    flex: 1;
+    justify-content: center;
+    padding: 0 6px;
+    font-size: 10px;
+  }
+
+  .profile-actions {
+    flex-direction: column-reverse;
+  }
+
+  .profile-actions button {
+    width: 100%;
+  }
+}

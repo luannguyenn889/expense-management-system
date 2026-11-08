@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -38,7 +39,7 @@ describe('Login', () => {
     const fixture = TestBed.createComponent(Login);
     fixture.detectChanges();
     const inputs = fixture.nativeElement.querySelectorAll('input');
-    inputs[0].value = 'minhanh';
+    inputs[0].value = '  minhanh  ';
     inputs[0].dispatchEvent(new Event('input'));
     inputs[1].value = 'password123';
     inputs[1].dispatchEvent(new Event('input'));
@@ -57,7 +58,15 @@ describe('Login', () => {
 
   it('should show an API error after a rejected sign-in', async () => {
     const authService = {
-      login: vi.fn().mockReturnValue(throwError(() => new Error('Thông tin đăng nhập không đúng.'))),
+      login: vi.fn().mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 401,
+              error: { message: 'Tài khoản không tồn tại' },
+            }),
+        ),
+      ),
     };
     await TestBed.configureTestingModule({
       imports: [Login],
@@ -76,7 +85,33 @@ describe('Login', () => {
     );
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Thông tin đăng nhập không đúng.');
+    expect(fixture.nativeElement.textContent).toContain(
+      'Tên đăng nhập hoặc mật khẩu không chính xác',
+    );
+    expect(fixture.nativeElement.textContent).not.toContain('Tài khoản không tồn tại');
+  });
+
+  it('should reject passwords longer than 72 characters before calling the API', async () => {
+    const authService = { login: vi.fn() };
+    await TestBed.configureTestingModule({
+      imports: [Login],
+      providers: [provideRouter([]), { provide: AuthService, useValue: authService }],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(Login);
+    fixture.detectChanges();
+    const inputs = fixture.nativeElement.querySelectorAll('input');
+    inputs[0].value = 'minhanh';
+    inputs[0].dispatchEvent(new Event('input'));
+    inputs[1].value = 'a'.repeat(73);
+    inputs[1].dispatchEvent(new Event('input'));
+    fixture.nativeElement.querySelector('form').dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
+    fixture.detectChanges();
+
+    expect(authService.login).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain('Mật khẩu không được vượt quá 72 ký tự.');
   });
 
   it('should show notice when Google sign-in service is not yet loaded', async () => {

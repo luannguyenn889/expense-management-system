@@ -34,9 +34,51 @@ describe('AuthService', () => {
 
     expect(sessionStorage.getItem(TOKEN_STORAGE_KEY)).toBe('jwt-token');
     expect(authService.getFullName()).toBe('Nguyễn Văn A');
+    expect(authService.getUsername()).toBe('vana');
 
     authService.logout();
     expect(sessionStorage.getItem(TOKEN_STORAGE_KEY)).toBeNull();
     expect(sessionStorage.getItem(USER_FULL_NAME_STORAGE_KEY)).toBeNull();
+    expect(authService.getUsername()).toBe('');
+  });
+
+  it('should log in after successful registration', () => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    authService = TestBed.inject(AuthService);
+    httpTesting = TestBed.inject(HttpTestingController);
+
+    authService
+      .register({
+        fullName: 'Nguyễn Văn A',
+        username: 'vana',
+        email: 'vana@example.com',
+        password: 'password123',
+      })
+      .subscribe();
+
+    httpTesting.expectOne(`${environment.apiUrl}/users/register`).flush({
+      code: 200,
+      message: 'Success',
+      data: {
+        userId: 1,
+        fullName: 'Nguyễn Văn A',
+        username: 'vana',
+        email: 'vana@example.com',
+      },
+    });
+
+    httpTesting.expectOne(`${environment.apiUrl}/auth/login`).flush({
+      code: 200,
+      message: 'Success',
+      data: {
+        accessToken: 'jwt-token',
+        user: { userId: 1, fullName: 'Nguyễn Văn A', username: 'vana', email: 'vana@example.com' },
+      },
+    });
+
+    expect(sessionStorage.getItem(TOKEN_STORAGE_KEY)).toBe('jwt-token');
+    expect(sessionStorage.getItem(USER_FULL_NAME_STORAGE_KEY)).toBe('Nguyễn Văn A');
   });
 });

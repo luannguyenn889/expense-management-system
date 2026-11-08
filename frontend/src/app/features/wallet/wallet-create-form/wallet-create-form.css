@@ -19,9 +19,9 @@
   height: 40px;
   place-items: center;
   border-radius: 12px;
-  background: #eaf5ed;
-  color: #20754b;
-  font-size: 24px;
+  background: #edf3ff;
+  color: #2864e8;
+  font-size: 21px;
 }
 
 .section-heading h2 {
@@ -44,7 +44,8 @@
   font-weight: 600;
 }
 
-.field input {
+.field input,
+.field select {
   width: 100%;
   height: 46px;
   padding: 0 12px;
@@ -57,8 +58,13 @@
 }
 
 .field input:focus {
-  border-color: #39815a;
-  box-shadow: 0 0 0 3px rgb(57 129 90 / 12%);
+  border-color: #3673ed;
+  box-shadow: 0 0 0 3px rgb(54 115 237 / 12%);
+}
+
+.field select:focus {
+  border-color: #3673ed;
+  box-shadow: 0 0 0 3px rgb(54 115 237 / 12%);
 }
 
 .field input[aria-invalid='true'] {
@@ -104,11 +110,15 @@
   min-height: 46px;
   border: 0;
   border-radius: 8px;
-  background: #20754b;
+  background: #2864e8;
   color: #fff;
   cursor: pointer;
   font-size: 13px;
   font-weight: 700;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #1d55d8;
 }
 
 .primary-button:disabled {

@@ -30,6 +30,9 @@ public class WalletController {
                 .body(ApiResponse.created("Tạo ví thành công", response));
     }
 
+    /**
+     * US5 [CNTT46-41]: Lấy danh sách các ví đang hoạt động của người dùng hiện tại.
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<WalletResponse>>> getWallets() {
         Long currentUserId = SecurityUtils.getCurrentUserId();
@@ -37,4 +40,3 @@ public class WalletController {
         return ResponseEntity.ok(ApiResponse.success(wallets));
     }
 }
-

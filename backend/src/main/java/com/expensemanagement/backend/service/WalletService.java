@@ -43,12 +43,16 @@ public class WalletService {
         return mapToWalletResponse(savedWallet);
     }
 
+    /**
+     * US5 [CNTT46-41]: Lấy danh sách các ví đang hoạt động của người dùng hiện tại,
+     * sắp xếp theo thời gian tạo giảm dần (ví mới nhất lên đầu).
+     */
     public List<WalletResponse> getWalletsByUser(Long userId) {
         if (userId == null) {
             throw new UnauthorizedException("Vui lòng đăng nhập để thực hiện chức năng này");
         }
 
-        return walletRepository.findByUserIdAndIsActiveTrue(userId).stream()
+        return walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId).stream()
                 .map(this::mapToWalletResponse)
                 .collect(Collectors.toList());
     }
@@ -65,4 +69,3 @@ public class WalletService {
                 .build();
     }
 }
-

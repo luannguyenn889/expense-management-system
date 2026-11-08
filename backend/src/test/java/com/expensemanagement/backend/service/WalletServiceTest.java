@@ -3,6 +3,7 @@ package com.expensemanagement.backend.service;
 import com.expensemanagement.backend.DTO.request.WalletCreateRequest;
 import com.expensemanagement.backend.DTO.response.WalletResponse;
 import com.expensemanagement.backend.entity.Wallet;
+import com.expensemanagement.backend.exception.UnauthorizedException;
 import com.expensemanagement.backend.repository.WalletRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -18,6 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -166,5 +170,93 @@ class WalletServiceTest {
 
         verify(walletRepository, never()).save(any(Wallet.class));
     }
-}
 
+    // =========================================================================
+    // US5 [CNTT46-41]: UNIT TEST CHO CHỨC NĂNG XEM DANH SÁCH VÍ
+    // =========================================================================
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Lấy danh sách ví khi người dùng có ví -> Trả về danh sách WalletResponse theo thứ tự mới nhất")
+    void getWalletsByUser_whenUserHasWallets_shouldReturnList() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        LocalDateTime now = LocalDateTime.now();
+
+        Wallet newestWallet = Wallet.builder()
+                .walletId(11L)
+                .userId(userId)
+                .walletName("Ví Ngân Hàng")
+                .balance(new BigDecimal("2000000.00"))
+                .isActive(true)
+                .createdAt(now)
+                .build();
+
+        Wallet olderWallet = Wallet.builder()
+                .walletId(10L)
+                .userId(userId)
+                .walletName("Ví Tiền Mặt")
+                .balance(new BigDecimal("500000.00"))
+                .isActive(true)
+                .createdAt(now.minusDays(1))
+                .build();
+
+        when(walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId))
+                .thenReturn(List.of(newestWallet, olderWallet));
+
+        // 2. Act (When)
+        List<WalletResponse> result = walletService.getWalletsByUser(userId);
+
+        // 3. Assert (Then)
+        assertThat(result).isNotNull().hasSize(2);
+        assertThat(result.get(0).getWalletId()).isEqualTo(11L);
+        assertThat(result.get(0).getWalletName()).isEqualTo("Ví Ngân Hàng");
+        assertThat(result.get(0).getBalance()).isEqualByComparingTo("2000000.00");
+        assertThat(result.get(1).getWalletId()).isEqualTo(10L);
+        assertThat(result.get(1).getWalletName()).isEqualTo("Ví Tiền Mặt");
+
+        verify(walletRepository, times(1)).findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId);
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Lấy danh sách ví khi người dùng chưa có ví -> Trả về danh sách rỗng []")
+    void getWalletsByUser_whenNoWallet_shouldReturnEmptyList() {
+        // 1. Arrange (Given)
+        Long userId = 2L;
+        when(walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId))
+                .thenReturn(Collections.emptyList());
+
+        // 2. Act (When)
+        List<WalletResponse> result = walletService.getWalletsByUser(userId);
+
+        // 3. Assert (Then)
+        assertThat(result).isNotNull().isEmpty();
+        verify(walletRepository, times(1)).findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId);
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Bảo mật dữ liệu -> Chỉ truy vấn ví thuộc về đúng userId hiện tại")
+    void getWalletsByUser_shouldQueryOnlyCurrentUserId() {
+        // 1. Arrange (Given)
+        Long currentUserId = 99L;
+        when(walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(currentUserId))
+                .thenReturn(Collections.emptyList());
+
+        // 2. Act (When)
+        walletService.getWalletsByUser(currentUserId);
+
+        // 3. Assert (Then)
+        verify(walletRepository, times(1)).findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(currentUserId);
+        verifyNoMoreInteractions(walletRepository);
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Lấy danh sách ví khi chưa đăng nhập (userId null) -> Ném UnauthorizedException (401)")
+    void getWalletsByUser_whenUserIdIsNull_shouldThrowUnauthorizedException() {
+        // 1. Arrange, 2. Act & 3. Assert
+        assertThatThrownBy(() -> walletService.getWalletsByUser(null))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("Vui lòng đăng nhập để thực hiện chức năng này");
+
+        verifyNoInteractions(walletRepository);
+    }
+}

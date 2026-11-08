@@ -23,6 +23,10 @@ export class WalletCreateForm {
   protected readonly errorMessage = signal('');
   protected readonly walletForm = this.formBuilder.nonNullable.group({
     walletName: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
+    walletType: this.formBuilder.nonNullable.control<'BANK_ACCOUNT' | 'CASH' | 'MOMO'>(
+      'BANK_ACCOUNT',
+      Validators.required,
+    ),
     balance: [0, [Validators.required, Validators.min(0)]],
   });
 
@@ -43,7 +47,7 @@ export class WalletCreateForm {
       )
       .subscribe({
         next: (wallet) => {
-          this.walletForm.reset({ walletName: '', balance: 0 });
+          this.walletForm.reset({ walletName: '', walletType: 'BANK_ACCOUNT', balance: 0 });
           this.walletCreated.emit(wallet);
         },
         error: (error: unknown) =>

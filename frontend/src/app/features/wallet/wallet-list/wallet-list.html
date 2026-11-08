@@ -1,71 +1,79 @@
-<main class="dashboard-shell">
-  <header class="topbar">
-    <a class="brand" routerLink="/wallets" aria-label="Ví Của Tôi">
-      <span class="brand-mark" aria-hidden="true">v.</span>
-      <span>ví của tôi</span>
+<section class="wallet-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">TỔNG QUAN TÀI CHÍNH</p>
+      <h1>Quản lý ví</h1>
+      <p class="page-description">Theo dõi các nguồn tiền của bạn ở một nơi.</p>
+    </div>
+    <a class="wallet-add-action" href="#create-wallet-title">
+      <span class="material-symbols-outlined" aria-hidden="true">add</span>
+      Thêm ví mới
     </a>
-    <button class="logout-button" type="button" (click)="onLogout()">
-      <span aria-hidden="true">↗</span>
-      Đăng xuất
-    </button>
   </header>
 
-  <div class="dashboard-content">
-    <section class="page-heading">
-      <div>
-        <p class="eyebrow">TỔNG QUAN TÀI CHÍNH</p>
-        <h1>Ví của bạn</h1>
-        <p class="page-description">Quản lý các ví và theo dõi số dư ở một nơi.</p>
+  <section class="balance-banner" aria-label="Tổng số dư hiện có">
+    <span class="balance-banner-icon material-symbols-outlined" aria-hidden="true">
+      account_balance_wallet
+    </span>
+    <div class="balance-banner-copy">
+      <span>Tổng số dư hiện có</span>
+      <strong>{{ totalBalance() | currencyVnd }}</strong>
+    </div>
+    <span class="balance-wallet-count">
+      <span aria-hidden="true"></span>
+      Đang quản lý {{ wallets().length }} ví
+    </span>
+  </section>
+
+  <div class="wallet-layout">
+    <section class="wallet-panel" aria-labelledby="wallet-list-title">
+      <div class="panel-heading">
+        <div>
+          <h2 id="wallet-list-title">Danh sách ví</h2>
+          <p>Nhấp vào số dư để theo dõi từng ví</p>
+        </div>
+        <span class="wallet-count">{{ wallets().length }}</span>
       </div>
-      <div class="balance-summary">
-        <span>Tổng số dư</span>
-        <strong>{{ totalBalance() | currencyVnd }}</strong>
-      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state" role="status">
+          <span class="loading-indicator" aria-hidden="true"></span>
+          <span>Đang tải danh sách ví...</span>
+        </div>
+      } @else if (errorMessage()) {
+        <div class="error-state" role="alert">
+          <p>{{ errorMessage() }}</p>
+          <button type="button" class="retry-button" (click)="loadWallets()">Thử lại</button>
+        </div>
+      } @else if (wallets().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon material-symbols-outlined" aria-hidden="true">
+            account_balance_wallet
+          </span>
+          <h3>Bạn chưa có ví nào</h3>
+          <p>Tạo ví đầu tiên để bắt đầu quản lý tài chính của mình.</p>
+        </div>
+      } @else {
+        <ul class="wallet-items">
+          @for (wallet of wallets(); track wallet.walletId) {
+            <li class="wallet-item">
+              <span class="wallet-icon material-symbols-outlined" aria-hidden="true">
+                {{ walletTypeIcon(wallet.walletType) }}
+              </span>
+              <div class="wallet-details">
+                <strong>{{ wallet.walletName }}</strong>
+                <span>
+                  {{ walletTypeLabel(wallet.walletType) }} ·
+                  {{ wallet.isActive === false ? 'Đã tạm ngưng' : 'Đang hoạt động' }}
+                </span>
+              </div>
+              <strong class="wallet-balance">{{ wallet.balance | currencyVnd }}</strong>
+            </li>
+          }
+        </ul>
+      }
     </section>
 
-    <div class="wallet-layout">
-      <section class="wallet-panel" aria-labelledby="wallet-list-title">
-        <div class="panel-heading">
-          <div>
-            <h2 id="wallet-list-title">Danh sách ví</h2>
-            <p>{{ wallets().length }} ví đang được quản lý</p>
-          </div>
-          <span class="wallet-count">{{ wallets().length }}</span>
-        </div>
-
-        @if (isLoading()) {
-          <div class="loading-state" role="status">
-            <span class="loading-indicator" aria-hidden="true"></span>
-            <span>Đang tải danh sách ví...</span>
-          </div>
-        } @else if (errorMessage()) {
-          <div class="error-state" role="alert">
-            <p>{{ errorMessage() }}</p>
-            <button type="button" class="retry-button" (click)="loadWallets()">Thử lại</button>
-          </div>
-        } @else if (wallets().length === 0) {
-          <div class="empty-state">
-            <span class="empty-icon" aria-hidden="true">▱</span>
-            <h3>Bạn chưa có ví nào</h3>
-            <p>Tạo ví đầu tiên để bắt đầu quản lý tài chính của mình.</p>
-          </div>
-        } @else {
-          <ul class="wallet-items">
-            @for (wallet of wallets(); track wallet.walletId) {
-              <li class="wallet-item">
-                <span class="wallet-icon" aria-hidden="true">▣</span>
-                <div class="wallet-details">
-                  <strong>{{ wallet.walletName }}</strong>
-                  <span>{{ wallet.isActive === false ? 'Đã tạm ngưng' : 'Đang hoạt động' }}</span>
-                </div>
-                <strong class="wallet-balance">{{ wallet.balance | currencyVnd }}</strong>
-              </li>
-            }
-          </ul>
-        }
-      </section>
-
-      <app-wallet-create-form (walletCreated)="onWalletCreated()" />
-    </div>
+    <app-wallet-create-form (walletCreated)="onWalletCreated()" />
   </div>
-</main>
+</section>

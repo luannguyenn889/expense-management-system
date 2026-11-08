@@ -1,6 +1,6 @@
 <section class="create-card" aria-labelledby="create-wallet-title">
   <div class="section-heading">
-    <span class="section-icon" aria-hidden="true">＋</span>
+    <span class="section-icon material-symbols-outlined" aria-hidden="true">add_circle</span>
     <div>
       <h2 id="create-wallet-title">Tạo ví mới</h2>
       <p>Tạo một ví để bắt đầu theo dõi chi tiêu.</p>
@@ -28,6 +28,15 @@
       } @else if (walletForm.controls.walletName.touched && walletForm.controls.walletName.hasError('maxlength')) {
         <small class="field-error">Tên ví không được vượt quá 100 ký tự.</small>
       }
+    </label>
+
+    <label class="field">
+      <span>Loại ví</span>
+      <select formControlName="walletType">
+        <option value="BANK_ACCOUNT">Tài khoản ngân hàng</option>
+        <option value="CASH">Tiền mặt</option>
+        <option value="MOMO">MoMo</option>
+      </select>
     </label>
 
     <label class="field">

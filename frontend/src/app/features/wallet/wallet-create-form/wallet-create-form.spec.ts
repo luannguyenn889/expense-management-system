@@ -8,7 +8,7 @@ describe('WalletCreateForm', () => {
   it('should accept wallet names up to 100 characters', async () => {
     const walletService = {
       createWallet: vi.fn().mockReturnValue(
-        of({ walletId: 1, walletName: 'a'.repeat(100), balance: 0 }),
+        of({ walletId: 1, walletName: 'a'.repeat(100), balance: 0, walletType: 'BANK_ACCOUNT' }),
       ),
     };
     await TestBed.configureTestingModule({
@@ -30,13 +30,19 @@ describe('WalletCreateForm', () => {
     expect(walletService.createWallet).toHaveBeenCalledWith({
       walletName: 'a'.repeat(100),
       balance: 0,
+      walletType: 'BANK_ACCOUNT',
     });
   });
 
-  it('should submit wallet details and clear the form after success', async () => {
+  it('should submit the selected wallet type and clear the form after success', async () => {
     const walletService = {
       createWallet: vi.fn().mockReturnValue(
-        of({ walletId: 1, walletName: 'Ví dự phòng', balance: 250000 }),
+        of({
+          walletId: 1,
+          walletName: 'Ví dự phòng',
+          balance: 250000,
+          walletType: 'BANK_ACCOUNT',
+        }),
       ),
     };
     await TestBed.configureTestingModule({
@@ -51,6 +57,9 @@ describe('WalletCreateForm', () => {
     inputs[0].dispatchEvent(new Event('input'));
     inputs[1].value = '250000';
     inputs[1].dispatchEvent(new Event('input'));
+    const typeSelect = fixture.nativeElement.querySelector('select');
+    typeSelect.value = 'MOMO';
+    typeSelect.dispatchEvent(new Event('change'));
     fixture.nativeElement.querySelector('form').dispatchEvent(
       new Event('submit', { bubbles: true, cancelable: true }),
     );
@@ -60,7 +69,9 @@ describe('WalletCreateForm', () => {
     expect(walletService.createWallet).toHaveBeenCalledWith({
       walletName: 'Ví dự phòng',
       balance: 250000,
+      walletType: 'MOMO',
     });
     expect(inputs[0].value).toBe('');
+    expect(typeSelect.value).toBe('BANK_ACCOUNT');
   });
 });

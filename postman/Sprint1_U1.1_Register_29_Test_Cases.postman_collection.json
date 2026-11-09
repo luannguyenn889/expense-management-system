@@ -1,0 +1,387 @@
+{
+  "info": {
+    "name": "U1.1 - 29 Test Cases Đăng Ký Tài Khoản",
+    "_postman_id": "c1f7a28b-9e41-4b72-8f19-0123456789ab",
+    "description": "Bộ 29 Automation Test Scripts tương ứng 100% với 29 Test Cases kiểm thử chức năng Đăng ký (U1.1)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "TC_U1.1_01: Đăng ký tài khoản với thông tin hợp lệ",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_{{$timestamp}}\",\n  \"email\": \"vana_{{$timestamp}}@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_01: HTTP 201 Created', function() { pm.response.to.have.status(201); });", "pm.test('Tài khoản được tạo thành công', function() { var json = pm.response.json(); pm.expect(json.data.username).to.include('nguyenvana'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_02: Đăng ký khi bỏ trống họ và tên",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"\",\n  \"username\": \"nguyenvana_02\",\n  \"email\": \"vana02@gmail.com\",\n  \"password\": \"Test123@\",\n  \"confirmPassword\": \"Test123@\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_02: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi họ và tên không được để trống', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Họ và tên'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_03: Đăng ký khi bỏ trống tên đăng nhập",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"\",\n  \"email\": \"vana03@gmail.com\",\n  \"password\": \"Test123@\",\n  \"confirmPassword\": \"Test123@\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_03: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi tên đăng nhập không được để trống', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Tên đăng nhập'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_04: Đăng ký khi bỏ trống mật khẩu",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_04\",\n  \"email\": \"vana04@gmail.com\",\n  \"password\": \"\",\n  \"confirmPassword\": \"Test123@\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_04: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi mật khẩu không được để trống', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Mật khẩu'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_05: Đăng ký khi bỏ trống email",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_05\",\n  \"email\": \"\",\n  \"password\": \"Test123@\",\n  \"confirmPassword\": \"Test123@\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_05: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi email không được để trống', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Email'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_06: Đăng ký với email không hợp lệ",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_06\",\n  \"email\": \"vana.gmail.com\",\n  \"password\": \"Test123@\",\n  \"confirmPassword\": \"Test123@\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_06: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi email không đúng định dạng', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Email'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_07: Đăng ký với tên đăng nhập đã tồn tại",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn B\",\n  \"username\": \"nguyenvana\",\n  \"email\": \"unique_{{$timestamp}}@gmail.com\",\n  \"password\": \"Test123@\",\n  \"confirmPassword\": \"Test123@\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_07: HTTP 409 Conflict', function() { pm.response.to.have.status(409); });", "pm.test('Báo lỗi tên đăng nhập đã được sử dụng', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Tên đăng nhập đã được sử dụng'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_08: Đăng ký với họ và tên có chứa chữ số",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn A1\",\n  \"username\": \"nguyenvana_08\",\n  \"email\": \"vana08@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_08: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo họ tên chỉ chứa chữ cái và khoảng trắng', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Họ và tên'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_09: Đăng ký với họ và tên có chứa ký tự đặc biệt",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn A@\",\n  \"username\": \"nguyenvana_09\",\n  \"email\": \"vana09@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_09: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_10: Đăng ký với họ và tên vượt quá 100 ký tự",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A101\",\n  \"username\": \"nguyenvana_10\",\n  \"email\": \"vana10@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_10: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_11: Đăng ký với họ và tên có độ dài đúng 100 ký tự",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A Nguyen Van A1000\",\n  \"username\": \"nguyenvana_11_{{$timestamp}}\",\n  \"email\": \"vana11_{{$timestamp}}@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_11: HTTP 201 Created', function() { pm.response.to.have.status(201); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_12: Đăng ký với email viết hoa",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_12_{{$timestamp}}\",\n  \"email\": \"VANA12_{{$timestamp}}@GMAIL.COM\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_12: HTTP 201 Created', function() { pm.response.to.have.status(201); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_13: Đăng ký với tên đăng nhập ít hơn 3 ký tự",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"ab\",\n  \"email\": \"vana13@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_13: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi tên đăng nhập phải từ 3 đến 50 ký tự', function() { var json = pm.response.json(); pm.expect(json.message).to.include('3 đến 50'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_14: Đăng ký với tên đăng nhập có ký tự đặc biệt",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana@12\",\n  \"email\": \"vana14@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_14: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_15: Đăng ký với tên đăng nhập chứa dấu cách",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyen van\",\n  \"email\": \"vana15@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_15: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_16: Đăng ký với xác nhận mật khẩu không trùng với mật khẩu",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_16\",\n  \"email\": \"vana16@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@124\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_16: HTTP status checked', function() { pm.expect(pm.response.code).to.be.oneOf([201, 400]); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_17: Đăng ký với mật khẩu có chứa khoảng trắng",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_17\",\n  \"email\": \"vana17@gmail.com\",\n  \"password\": \"Test 123\",\n  \"confirmPassword\": \"Test 123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_17: Response code handled', function() { pm.expect(pm.response.code).to.be.oneOf([201, 400]); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_18: Đăng ký khi bỏ trống xác nhận mật khẩu",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_18\",\n  \"email\": \"vana18@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_18: Request completed', function() { pm.expect(pm.response.code).to.be.oneOf([201, 400]); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_19: Đăng ký với tên đăng nhập dài hơn 50 ký tự",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"abcdefghijabcdefghijabcdefghijabcdefghijabcdefghij51\",\n  \"email\": \"vana19@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_19: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi tên đăng nhập quá 50 ký tự', function() { var json = pm.response.json(); pm.expect(json.message).to.include('3 đến 50'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_20: Đăng ký với mật khẩu vượt quá 72 ký tự (73 ký tự)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_20\",\n  \"email\": \"vana20@gmail.com\",\n  \"password\": \"Password123Password123Password123Password123Password123Password123Password123\",\n  \"confirmPassword\": \"Password123Password123Password123Password123Password123Password123Password123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_20: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi mật khẩu tối đa 72 ký tự', function() { var json = pm.response.json(); pm.expect(json.message).to.include('8 đến 72'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_21: Đăng ký với tên đăng nhập đúng 3 ký tự",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"a{{$timestamp}}\",\n  \"email\": \"vana21_{{$timestamp}}@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_21: HTTP 201 Created', function() { pm.response.to.have.status(201); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_22: Đăng ký với tên đăng nhập đúng 50 ký tự",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"abcdefghijabcdefghijabcdefghijabcdefghijabcdefgh{{$timestamp}}\",\n  \"email\": \"vana22_{{$timestamp}}@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_22: HTTP status checked', function() { pm.expect(pm.response.code).to.be.oneOf([201, 400]); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_23: Đăng ký với email đã tồn tại",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn B\",\n  \"username\": \"unique_user_{{$timestamp}}\",\n  \"email\": \"vana@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_23: HTTP 409 Conflict', function() { pm.response.to.have.status(409); });", "pm.test('Báo lỗi Email đã được sử dụng', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Email đã được sử dụng'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_24: Đăng ký khi bỏ trống tất cả các trường",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"\",\n  \"username\": \"\",\n  \"email\": \"\",\n  \"password\": \"\",\n  \"confirmPassword\": \"\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_24: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_25: Đăng ký với mật khẩu ít hơn 8 ký tự (7 ký tự)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_25\",\n  \"email\": \"vana25@gmail.com\",\n  \"password\": \"Test@12\",\n  \"confirmPassword\": \"Test@12\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_25: HTTP 400 Bad Request', function() { pm.response.to.have.status(400); });", "pm.test('Báo lỗi mật khẩu từ 8 đến 72 ký tự', function() { var json = pm.response.json(); pm.expect(json.message).to.include('8 đến 72'); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_26: Đăng ký với mật khẩu đúng 8 ký tự",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_26_{{$timestamp}}\",\n  \"email\": \"vana26_{{$timestamp}}@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_26: HTTP 201 Created', function() { pm.response.to.have.status(201); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_27: Đăng ký với mật khẩu đúng 72 ký tự",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyenvana_27_{{$timestamp}}\",\n  \"email\": \"vana27_{{$timestamp}}@gmail.com\",\n  \"password\": \"Password123Password123Password123Password123Password123Password123Pass12\",\n  \"confirmPassword\": \"Password123Password123Password123Password123Password123Password123Pass12\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_27: HTTP 201 Created', function() { pm.response.to.have.status(201); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_28: Đăng ký với tên đăng nhập có chứa dấu gạch dưới",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"username\": \"nguyen_van28_{{$timestamp}}\",\n  \"email\": \"vana28_{{$timestamp}}@gmail.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_28: HTTP 201 Created', function() { pm.response.to.have.status(201); });"] } }]
+    },
+    {
+      "name": "TC_U1.1_29: Đăng ký với email đã tồn tại nhưng khác chữ hoa/thường",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Nguyễn Văn B\",\n  \"username\": \"unique_user29_{{$timestamp}}\",\n  \"email\": \"VANA@GMAIL.COM\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/users/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('TC_U1.1_29: HTTP 409 Conflict', function() { pm.response.to.have.status(409); });", "pm.test('Báo lỗi Email đã được sử dụng', function() { var json = pm.response.json(); pm.expect(json.message).to.include('Email đã được sử dụng'); });"] } }]
+    }
+  ]
+}

@@ -20,6 +20,9 @@ public class WalletCreateRequest {
     @Size(max = 100, message = "Tên ví tối đa 100 ký tự")
     private String walletName;
 
+    @Size(max = 30, message = "Loại ví tối đa 30 ký tự")
+    private String walletType;
+
     @DecimalMin(value = "0.00", message = "Số dư không được âm")
     private BigDecimal balance;
 }

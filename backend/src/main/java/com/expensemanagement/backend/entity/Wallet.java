@@ -29,6 +29,10 @@ public class Wallet {
     private String walletName;
 
     @Builder.Default
+    @Column(name = "wallet_type", nullable = false, length = 30)
+    private String walletType = "CASH";
+
+    @Builder.Default
     @Column(name = "balance", nullable = false, precision = 15, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 

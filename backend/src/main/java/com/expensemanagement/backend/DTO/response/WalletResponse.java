@@ -17,6 +17,7 @@ public class WalletResponse {
     private Long walletId;
     private Long userId;
     private String walletName;
+    private String walletType;
     private BigDecimal balance;
     private Boolean isActive;
     private LocalDateTime createdAt;

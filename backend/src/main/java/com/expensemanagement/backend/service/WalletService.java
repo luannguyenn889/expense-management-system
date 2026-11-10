@@ -3,6 +3,7 @@ package com.expensemanagement.backend.service;
 import com.expensemanagement.backend.DTO.request.WalletCreateRequest;
 import com.expensemanagement.backend.DTO.response.WalletResponse;
 import com.expensemanagement.backend.entity.Wallet;
+import com.expensemanagement.backend.exception.DuplicateResourceException;
 import com.expensemanagement.backend.exception.UnauthorizedException;
 import com.expensemanagement.backend.repository.WalletRepository;
 import org.springframework.stereotype.Service;
@@ -32,9 +33,19 @@ public class WalletService {
             throw new IllegalArgumentException("Số dư không được âm");
         }
 
+        String trimmedName = request.getWalletName().trim();
+        String normalizedType = (request.getWalletType() != null && !request.getWalletType().isBlank())
+                ? request.getWalletType().trim().toUpperCase()
+                : "CASH";
+
+        if (walletRepository.existsByUserIdAndWalletNameIgnoreCaseAndWalletType(userId, trimmedName, normalizedType)) {
+            throw new DuplicateResourceException("Ví có cùng tên và loại đã tồn tại trong tài khoản của bạn");
+        }
+
         Wallet wallet = Wallet.builder()
                 .userId(userId)
-                .walletName(request.getWalletName().trim())
+                .walletName(trimmedName)
+                .walletType(normalizedType)
                 .balance(initialBalance)
                 .isActive(true)
                 .build();
@@ -62,6 +73,7 @@ public class WalletService {
                 .walletId(wallet.getWalletId())
                 .userId(wallet.getUserId())
                 .walletName(wallet.getWalletName())
+                .walletType(wallet.getWalletType())
                 .balance(wallet.getBalance())
                 .isActive(wallet.getIsActive())
                 .createdAt(wallet.getCreatedAt())

@@ -3,6 +3,7 @@ package com.expensemanagement.backend.service;
 import com.expensemanagement.backend.DTO.request.WalletCreateRequest;
 import com.expensemanagement.backend.DTO.response.WalletResponse;
 import com.expensemanagement.backend.entity.Wallet;
+import com.expensemanagement.backend.exception.DuplicateResourceException;
 import com.expensemanagement.backend.exception.UnauthorizedException;
 import com.expensemanagement.backend.repository.WalletRepository;
 import jakarta.validation.ConstraintViolation;
@@ -169,6 +170,67 @@ class WalletServiceTest {
                 .hasMessage("Số dư không được âm");
 
         verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
+    @Test
+    @DisplayName("Tạo ví trùng cả tên ví và loại ví cho cùng người dùng -> Ném DuplicateResourceException (409)")
+    void createWallet_withDuplicateNameAndType_shouldThrowDuplicateResourceException() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        String walletName = "Ví Tiết Kiệm";
+        String walletType = "BANK_ACCOUNT";
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName(walletName)
+                .walletType(walletType)
+                .balance(new BigDecimal("500000.00"))
+                .build();
+
+        when(walletRepository.existsByUserIdAndWalletNameIgnoreCaseAndWalletType(userId, walletName, walletType))
+                .thenReturn(true);
+
+        // 2. Act (When) & 3. Assert (Then)
+        assertThatThrownBy(() -> walletService.createWallet(userId, request))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("Ví có cùng tên và loại đã tồn tại trong tài khoản của bạn");
+
+        verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
+    @Test
+    @DisplayName("Tạo ví cùng tên nhưng khác loại ví cho cùng người dùng -> Thành công không bị trùng lặp")
+    void createWallet_withSameNameDifferentType_shouldCreateSuccessfully() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        String walletName = "Ví Tiêu Dùng";
+        String walletType = "MOMO";
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName(walletName)
+                .walletType(walletType)
+                .balance(new BigDecimal("200000.00"))
+                .build();
+
+        when(walletRepository.existsByUserIdAndWalletNameIgnoreCaseAndWalletType(userId, walletName, walletType))
+                .thenReturn(false);
+
+        Wallet savedWallet = Wallet.builder()
+                .walletId(99L)
+                .userId(userId)
+                .walletName(walletName)
+                .walletType(walletType)
+                .balance(new BigDecimal("200000.00"))
+                .isActive(true)
+                .build();
+
+        when(walletRepository.save(any(Wallet.class))).thenReturn(savedWallet);
+
+        // 2. Act (When)
+        WalletResponse response = walletService.createWallet(userId, request);
+
+        // 3. Assert (Then)
+        assertThat(response).isNotNull();
+        assertThat(response.getWalletName()).isEqualTo(walletName);
+        assertThat(response.getWalletType()).isEqualTo(walletType);
+        verify(walletRepository, times(1)).save(any(Wallet.class));
     }
 
     // =========================================================================

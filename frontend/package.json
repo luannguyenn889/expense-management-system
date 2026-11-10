@@ -11,7 +11,8 @@
     "cypress:run": "cypress run --spec cypress/e2e/register-31-cases.cy.ts",
     "cypress:run:register": "cypress run --spec cypress/e2e/register-31-cases.cy.ts",
     "cypress:run:login": "cypress run --spec cypress/e2e/login-11-cases.cy.ts",
-    "cypress:run:all": "cypress run"
+    "cypress:run:all": "cypress run",
+    "cypress:run:google": "cypress run --spec cypress/e2e/google-login.cy.ts"
   },
   "prettier": {
     "printWidth": 100,

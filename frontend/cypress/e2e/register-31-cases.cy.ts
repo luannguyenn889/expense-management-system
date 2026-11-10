@@ -1,4 +1,4 @@
-describe('U1.1: E2E Automation Test - 29 Test Cases Đăng Ký Tài Khoản', () => {
+describe('U1.1: E2E Automation Test - 31 Test Cases Đăng Ký Tài Khoản', () => {
   beforeEach(() => {
     // Truy cập vào trang đăng ký trước mỗi ca kiểm thử
     cy.visit('/register');
@@ -496,5 +496,39 @@ describe('U1.1: E2E Automation Test - 29 Test Cases Đăng Ký Tài Khoản', ()
     // 3. Assert (Then): Báo lỗi email đã được sử dụng
     cy.wait('@registerDupEmailUpper');
     cy.contains('Email đã được sử dụng.').should('be.visible');
+  });
+
+  // TC_U1.1_30
+  it('TC_U1.1_30_register_togglePasswordVisibility_shouldShowAndHidePassword', () => {
+    // 1. Arrange (Given): Nhập mật khẩu vào trường Mật khẩu
+    cy.get('#register-password').type('Test@123');
+
+    // 2. Act & Assert: Ban đầu mật khẩu hiển thị dưới dạng ký tự ẩn
+    cy.get('#register-password').should('have.attr', 'type', 'password');
+
+    // 3. Act & Assert: Nhấn biểu tượng con mắt -> mật khẩu hiển thị rõ (type="text")
+    cy.get('#register-password').parent().find('.password-visibility-toggle').click();
+    cy.get('#register-password').should('have.attr', 'type', 'text');
+
+    // 4. Act & Assert: Nhấn biểu tượng con mắt lần nữa -> mật khẩu được ẩn trở lại (type="password")
+    cy.get('#register-password').parent().find('.password-visibility-toggle').click();
+    cy.get('#register-password').should('have.attr', 'type', 'password');
+  });
+
+  // TC_U1.1_31
+  it('TC_U1.1_31_register_toggleConfirmPasswordVisibility_shouldShowAndHidePassword', () => {
+    // 1. Arrange (Given): Nhập mật khẩu vào trường Xác nhận mật khẩu
+    cy.get('#register-confirm-password').type('Test@123');
+
+    // 2. Act & Assert: Ban đầu mật khẩu hiển thị dưới dạng ký tự ẩn
+    cy.get('#register-confirm-password').should('have.attr', 'type', 'password');
+
+    // 3. Act & Assert: Nhấn biểu tượng con mắt -> mật khẩu hiển thị rõ (type="text")
+    cy.get('#register-confirm-password').parent().find('.password-visibility-toggle').click();
+    cy.get('#register-confirm-password').should('have.attr', 'type', 'text');
+
+    // 4. Act & Assert: Nhấn biểu tượng con mắt lần nữa -> mật khẩu được ẩn trở lại (type="password")
+    cy.get('#register-confirm-password').parent().find('.password-visibility-toggle').click();
+    cy.get('#register-confirm-password').should('have.attr', 'type', 'password');
   });
 });

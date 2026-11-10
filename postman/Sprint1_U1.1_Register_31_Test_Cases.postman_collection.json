@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "U1.1 - 29 Test Cases Đăng Ký Tài Khoản",
+    "name": "U1.1 - 31 Test Cases Đăng Ký Tài Khoản",
     "_postman_id": "c1f7a28b-9e41-4b72-8f19-0123456789ab",
-    "description": "Bộ 29 Automation Test Scripts tương ứng 100% với 29 Test Cases kiểm thử chức năng Đăng ký (U1.1)",
+    "description": "Bộ 31 Automation Test Scripts tương ứng 100% với 31 Test Cases kiểm thử chức năng Đăng ký (U1.1)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { AuthService } from '../../../core/services/auth.service';
 import { Register } from './register';
 
-describe('U1.1: Đăng ký tài khoản - Bộ 29 Automation Test Scripts', () => {
+describe('U1.1: Đăng ký tài khoản - Bộ 31 Automation Test Scripts', () => {
   async function createTestContext(authServiceMock?: any) {
     const defaultAuthService = {
       register: vi.fn().mockReturnValue(of({ user: { userId: 1, email: 'vana@gmail.com' }, token: 'mock-token' })),
@@ -513,5 +513,37 @@ describe('U1.1: Đăng ký tài khoản - Bộ 29 Automation Test Scripts', () =
     });
 
     expect(fixture.nativeElement.textContent).toContain('Email đã được sử dụng.');
+  });
+
+  // TC_U1.1_30: Kiểm tra chức năng ẩn/hiện mật khẩu của trường Mật khẩu
+  it('TC_U1.1_30: Kiểm tra chức năng ẩn/hiện mật khẩu của trường Mật khẩu', async () => {
+    const { fixture } = await createTestContext();
+    const passwordInput = fixture.nativeElement.querySelector('#register-password') as HTMLInputElement;
+    const toggles = fixture.nativeElement.querySelectorAll('.password-visibility-toggle');
+    const passwordToggle = toggles[0] as HTMLButtonElement;
+
+    expect(passwordInput.type).toBe('password');
+    passwordToggle.click();
+    fixture.detectChanges();
+    expect(passwordInput.type).toBe('text');
+    passwordToggle.click();
+    fixture.detectChanges();
+    expect(passwordInput.type).toBe('password');
+  });
+
+  // TC_U1.1_31: Kiểm tra chức năng ẩn/hiện mật khẩu của trường Xác nhận mật khẩu
+  it('TC_U1.1_31: Kiểm tra chức năng ẩn/hiện mật khẩu của trường Xác nhận mật khẩu', async () => {
+    const { fixture } = await createTestContext();
+    const confirmPasswordInput = fixture.nativeElement.querySelector('#register-confirm-password') as HTMLInputElement;
+    const toggles = fixture.nativeElement.querySelectorAll('.password-visibility-toggle');
+    const confirmPasswordToggle = toggles[1] as HTMLButtonElement;
+
+    expect(confirmPasswordInput.type).toBe('password');
+    confirmPasswordToggle.click();
+    fixture.detectChanges();
+    expect(confirmPasswordInput.type).toBe('text');
+    confirmPasswordToggle.click();
+    fixture.detectChanges();
+    expect(confirmPasswordInput.type).toBe('password');
   });
 });

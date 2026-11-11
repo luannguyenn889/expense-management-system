@@ -6,7 +6,13 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run --spec cypress/e2e/register-31-cases.cy.ts",
+    "cypress:run:register": "cypress run --spec cypress/e2e/register-31-cases.cy.ts",
+    "cypress:run:login": "cypress run --spec cypress/e2e/login-11-cases.cy.ts",
+    "cypress:run:all": "cypress run",
+    "cypress:run:google": "cypress run --spec cypress/e2e/google-login.cy.ts"
   },
   "prettier": {
     "printWidth": 100,
@@ -36,6 +42,7 @@
     "@angular/build": "^21.1.1",
     "@angular/cli": "^21.1.1",
     "@angular/compiler-cli": "^21.1.0",
+    "cypress": "^16.2.1",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

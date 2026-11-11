@@ -1,0 +1,808 @@
+﻿{
+  "info": {
+    "name": "U2.2 - 21 Test Cases Xem Danh S├ích V├¡",
+    "_postman_id": "c3d4e5f6-wallet-list-21-cases",
+    "description": "Automation Test Script t╞░╞íng ß╗⌐ng vß╗¢i Test Case kiß╗âm thß╗¡ chß╗⌐c n─âng Xem danh s├ích v├¡ (U2.2) - ─Éß║ºy ─æß╗º 27 kß╗ïch bß║ún",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "TC_U2.2_01: Hiß╗ân thß╗ï danh s├ích c├íc v├¡ cß╗ºa ng╞░ß╗¥i d├╣ng",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_01: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_02: Hiß╗ân thß╗ï ─æ├║ng t├¬n v├á loß║íi v├¡",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_02: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_03: Hiß╗ân thß╗ï ─æ├║ng sß╗æ d╞░ cß╗ºa tß╗½ng v├¡",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_03: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_04: Chß╗ë hiß╗ân thß╗ï v├¡ thuß╗Öc t├ái khoß║ún ─æang ─æ─âng nhß║¡p",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_04: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_05: Hiß╗ân thß╗ï khi ng╞░ß╗¥i d├╣ng ch╞░a c├│ v├¡ n├áo",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_05: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_06: Tß║úi lß║íi danh s├ích v├¡ khi tß║úi lß║íi trang",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_06: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_07: T├¡nh tß╗òng sß╗æ d╞░ khi c├│ nhiß╗üu v├¡",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_07: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_08: T├¡nh tß╗òng sß╗æ d╞░ khi chß╗ë c├│ 1 v├¡",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_08: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_09: Hiß╗ân thß╗ï tß╗òng sß╗æ d╞░ khi ch╞░a c├│ v├¡",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_09: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_10: Cß║¡p nhß║¡t tß╗òng sß╗æ d╞░ sau khi tß║ío v├¡ mß╗¢i",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_10: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_11: Hiß╗ân thß╗ï ─æ├║ng sß╗æ l╞░ß╗úng v├¡ trong danh s├ích",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_11: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_12: Hiß╗ân thß╗ï c├íc v├¡ tr├╣ng t├¬n nh╞░ng kh├íc loß║íi",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_12: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_13: ─Éß╗æi chiß║┐u tß╗òng sß╗æ d╞░ tr├¬n Dashboard vß╗¢i danh s├ích v├¡",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_13: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_14: Hiß╗ân thß╗ï ch├¡nh x├íc sß╗æ d╞░ c├│ phß║ºn lß║╗ theo ─æ╞ín vß╗ï tiß╗ün",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_14: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_15: Kiß╗âm tra dß╗» liß╗çu v├¡ khi chuyß╗ân qua lß║íi giß╗»a c├íc m├án h├¼nh",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_15: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_16: Hiß╗ân thß╗ï sß╗æ d╞░ c├│ nhiß╗üu chß╗» sß╗æ",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_16: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_17: T├¡nh tß╗òng sß╗æ d╞░ khi tß║Ñt cß║ú v├¡ ─æß╗üu c├│ sß╗æ d╞░ bß║▒ng 0",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_17: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_18: Kiß╗âm tra dß╗» liß╗çu v├¡ sau khi ─æ─âng xuß║Ñt v├á ─æ─âng nhß║¡p lß║íi",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_18: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_19: Chß╗ë t├¡nh tß╗òng sß╗æ d╞░ c├íc v├¡ thuß╗Öc t├ái khoß║ún ─æang ─æ─âng nhß║¡p",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_19: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_20: Giß╗» nguy├¬n tß╗òng sß╗æ d╞░ sau khi tß║úi lß║íi Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_20: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.2_21: Hiß╗ân thß╗ï danh s├ích khi ng╞░ß╗¥i d├╣ng c├│ nhiß╗üu v├¡",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.2_21: HTTP 200 OK', function() { pm.response.to.have.status(200); });",
+              "pm.test('Trß║ú vß╗ü danh s├ích v├¡ hß╗úp lß╗ç', function() { var json = pm.response.json(); pm.expect(json.data).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

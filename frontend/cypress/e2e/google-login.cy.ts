@@ -1,12 +1,10 @@
 describe('U1.3: E2E Automation Test - Đăng Nhập Bằng Google', () => {
   beforeEach(() => {
-    // Chặn file script ngoài để tránh bị ghi đè
     cy.intercept('GET', 'https://accounts.google.com/gsi/client', {
       statusCode: 200,
       body: 'console.log("Mocked Google GIS loaded");',
     }).as('gsiScript');
 
-    // Intercept Google auth API
     cy.intercept('POST', '**/api/v1/auth/google', {
       statusCode: 200,
       body: {
@@ -24,7 +22,6 @@ describe('U1.3: E2E Automation Test - Đăng Nhập Bằng Google', () => {
       },
     }).as('googleAuthApi');
 
-    // Chặn fallback endpoint nếu không có prefix api/v1
     cy.intercept('POST', '**/auth/google', {
       statusCode: 200,
       body: {
@@ -69,10 +66,14 @@ describe('U1.3: E2E Automation Test - Đăng Nhập Bằng Google', () => {
 
   // TC_U1.3_01
   it('TC_U1.3_01_loginWithGoogle_withValidGoogleAccount_shouldRedirectToDashboard', () => {
+    // 1. Arrange (Given): Đang ở trang đăng nhập với dịch vụ Google sẵn sàng
     cy.url().should('include', '/login');
+
+    // 2. Act (When): Nhấn nút Đăng nhập bằng Google
     cy.get('.google-button').should('be.visible').click();
 
-    // Hệ thống chuyển hướng về trang chủ
+    // 3. Assert (Then): Hệ thống chuyển hướng vào dashboard
     cy.url().should('include', '/dashboard');
   });
+
 });

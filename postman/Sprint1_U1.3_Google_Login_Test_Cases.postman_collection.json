@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "U1.3 - 01 Test Case Đăng Nhập Bằng Google",
-    "_postman_id": "f3a7c82d-4567-4b8c-8d9e-googlelogin01",
+    "_postman_id": "f3a7c82d-4567-4b8c-8d9e-googlelogin03",
     "description": "Automation Test Script tương ứng 100% với Test Case kiểm thử chức năng Đăng nhập bằng Google (U1.3)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -10,12 +10,28 @@
       "name": "TC_U1.3_01: Đăng nhập Google thành công",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"idToken\": \"mock-google-valid-id-token-credential\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/api/v1/auth/google", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "google"] }
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/google",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "google"
+          ]
+        }
       },
       "event": [
         {

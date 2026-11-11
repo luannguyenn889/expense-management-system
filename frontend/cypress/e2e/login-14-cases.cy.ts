@@ -1,4 +1,4 @@
-describe('U1.2: E2E Automation Test - 11 Test Cases Đăng Nhập Bằng Mật Khẩu', () => {
+describe('U1.2: E2E Automation Test - 14 Test Cases Đăng Nhập Bằng Mật Khẩu', () => {
   beforeEach(() => {
     // 1. Truy cập vào trang đăng nhập trước mỗi ca kiểm thử
     cy.visit('/login');
@@ -201,5 +201,73 @@ describe('U1.2: E2E Automation Test - 11 Test Cases Đăng Nhập Bằng Mật K
     cy.wait('@loginCaseMismatch');
     cy.get('.form-alert').should('be.visible').and('contain.text', 'Tên đăng nhập hoặc mật khẩu không chính xác');
     cy.url().should('include', '/login');
+  });
+
+  // TC_U1.2_12
+  it('TC_U1.2_12_login_withUnregisteredEmail_shouldShowErrorMessage', () => {
+    // 1. Arrange (Given): Mock API login lỗi email chưa đăng ký
+    cy.intercept('POST', '**/auth/login', {
+      statusCode: 401,
+      body: { code: 401, message: 'Tên đăng nhập hoặc mật khẩu không chính xác' },
+    }).as('loginUnregisteredEmail');
+
+    // 2. Act (When): Nhập email chưa tồn tại trong hệ thống
+    cy.get('input[formControlName="username"]').type('khongtontai@gmail.com');
+    cy.get('input[formControlName="password"]').type('Test@123');
+    cy.get('button[type="submit"]').click();
+
+    // 3. Assert (Then): Hiển thị thông báo lỗi và không tạo phiên đăng nhập
+    cy.wait('@loginUnregisteredEmail');
+    cy.get('.form-alert').should('be.visible').and('contain.text', 'Tên đăng nhập hoặc mật khẩu không chính xác');
+    cy.url().should('include', '/login');
+  });
+
+  // TC_U1.2_13
+  it('TC_U1.2_13_login_withCaseInsensitiveUsername_shouldLoginSuccess', () => {
+    // 1. Arrange (Given): Mock login thành công khi nhập username khác hoa thường
+    cy.intercept('POST', '**/auth/login', {
+      statusCode: 200,
+      body: {
+        code: 200,
+        message: 'Đăng nhập thành công',
+        data: {
+          token: 'mock-jwt-token-case-user',
+          user: { fullName: 'Nguyễn Văn A', username: 'nguyenvana' },
+        },
+      },
+    }).as('loginCaseUser');
+
+    // 2. Act (When): Nhập NguyenVanA thay vì nguyenvana
+    cy.get('input[formControlName="username"]').type('NguyenVanA');
+    cy.get('input[formControlName="password"]').type('Test@123');
+    cy.get('button[type="submit"]').click();
+
+    // 3. Assert (Then): Hệ thống xử lý đăng nhập thành công và về trang chủ
+    cy.wait('@loginCaseUser');
+    cy.url().should('include', '/dashboard');
+  });
+
+  // TC_U1.2_14
+  it('TC_U1.2_14_login_byPressingEnterKey_shouldSubmitAndRedirectToDashboard', () => {
+    // 1. Arrange (Given): Mock login thành công
+    cy.intercept('POST', '**/auth/login', {
+      statusCode: 200,
+      body: {
+        code: 200,
+        message: 'Đăng nhập thành công',
+        data: {
+          token: 'mock-jwt-token-enter-submit',
+          user: { fullName: 'Nguyễn Văn A', username: 'nguyenvana' },
+        },
+      },
+    }).as('loginEnterSubmit');
+
+    // 2. Act (When): Nhập thông tin và nhấn Enter tại trường Mật khẩu
+    cy.get('input[formControlName="username"]').type('nguyenvana');
+    cy.get('input[formControlName="password"]').type('Test@123{enter}');
+
+    // 3. Assert (Then): Form được submit và chuyển đến màn hình dashboard
+    cy.wait('@loginEnterSubmit');
+    cy.url().should('include', '/dashboard');
   });
 });

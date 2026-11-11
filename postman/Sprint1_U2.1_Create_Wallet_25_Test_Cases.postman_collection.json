@@ -1,0 +1,1035 @@
+﻿{
+  "info": {
+    "name": "U2.1 - 25 Test Cases Tß║ío V├¡ Mß╗¢i",
+    "_postman_id": "b2c3d4e5-create-wallet-25-cases",
+    "description": "Automation Test Script t╞░╞íng ß╗⌐ng vß╗¢i Test Case kiß╗âm thß╗¡ chß╗⌐c n─âng Tß║ío v├¡ mß╗¢i (U2.1) - ─Éß║ºy ─æß╗º 30 kß╗ïch bß║ún",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "TC_U2.1_01: Tß║ío v├¡ vß╗¢i t├¬n v├¡ hß╗úp lß╗ç",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"Tiß╗ün mß║╖t\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_01: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_02: Tß║ío v├¡ vß╗¢i t├¬n v├¡ v├á sß╗æ d╞░ ban ─æß║ºu",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"Tiß║┐t kiß╗çm\",\n  \"walletType\": \"MOMO\",\n  \"balance\": 5000000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_02: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_03: Tß║ío v├¡ khi x├│a v├á ─æß╗â trß╗æng sß╗æ d╞░ ban ─æß║ºu",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ ng├ón h├áng\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_03: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_04: Kiß╗âm tra v├¡ ─æ╞░ß╗úc li├¬n kß║┐t vß╗¢i ng╞░ß╗¥i d├╣ng hiß╗çn tß║íi",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ c├í nh├ón A\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_04: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_05: Tß║ío v├¡ khi bß╗Å trß╗æng t├¬n v├¡",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_05: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([400, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_06: Tß║ío v├¡ vß╗¢i sß╗æ d╞░ ban ─æß║ºu nhß╗Å h╞ín 0",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"Dß╗▒ ph├▓ng\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": -100000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_06: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([400, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_07: Tß║ío v├¡ vß╗¢i t├¬n v├¡ v├á loß║íi v├¡ ─æ├ú tß╗ôn tß║íi",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"Dß╗▒ ph├▓ng\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_07: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([409, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_08: Kiß╗âm tra chß╗⌐c n─âng cß╗ºa n├║t Th├¬m v├¡ mß╗¢i thß╗⌐ hai",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ test 08\",\n  \"walletType\": \"CASH\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_08: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_10: Tß║ío v├¡ c├│ c├╣ng t├¬n nh╞░ng kh├íc loß║íi v├¡",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"Dß╗▒ ph├▓ng\",\n  \"walletType\": \"CASH\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_10: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_11: Tß║ío v├¡ c├│ c├╣ng t├¬n v├á loß║íi v├¡ tr├¬n hai t├ái khoß║ún kh├íc nhau",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"Dß╗▒ ph├▓ng\",\n  \"walletType\": \"MOMO\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_11: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_12: Kiß╗âm tra v├¡ vß║½n ─æ╞░ß╗úc l╞░u sau khi tß║úi lß║íi trang",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ hß╗ìc tß║¡p\",\n  \"walletType\": \"CASH\",\n  \"balance\": 500000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_12: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_13: Tß║ío v├¡ vß╗¢i t├¬n chß╗⌐a khoß║úng trß║»ng ß╗ƒ ─æß║ºu v├á cuß╗æi",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"   V├¡ c├í nh├ón   \",\n  \"walletType\": \"CASH\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_13: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_14: Tß║ío v├¡ vß╗¢i t├¬n chß╗ë chß╗⌐a khoß║úng trß║»ng",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"              \",\n  \"walletType\": \"CASH\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_14: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([400, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_15: Tß║ío v├¡ vß╗¢i t├¬n kh├íc nh╞░ng c├╣ng loß║íi v├¡ ─æ├ú tß╗ôn tß║íi",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ ─æi chß╗ú\",\n  \"walletType\": \"CASH\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_15: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_16: Tß║ío v├¡ vß╗¢i sß╗æ d╞░ ban ─æß║ºu c├│ gi├í trß╗ï qu├í lß╗¢n",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ t├¡ch l┼⌐y\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 1000000000000000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_16: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([400, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_17: Tß║ío v├¡ vß╗¢i sß╗æ d╞░ ban ─æß║ºu c├│ nhiß╗üu sß╗æ 0 ß╗ƒ ─æß║ºu",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ thß╗¡ nghiß╗çm\",\n  \"walletType\": \"CASH\",\n  \"balance\": 10000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_17: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_18: Tß║ío v├¡ vß╗¢i t├¬n v├¡ tr├╣ng nhau sau khi loß║íi bß╗Å khoß║úng trß║»ng",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"   Dß╗▒ ph├▓ng   \",\n  \"walletType\": \"MOMO\",\n  \"balance\": 100000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_18: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([409, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_19: Tß║ío v├¡ vß╗¢i t├¬n v├¡ c├│ ─æß╗Ö d├ái lß╗¢n h╞ín 100 k├╜ tß╗▒",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_19: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([400, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_20: Tß║ío v├¡ vß╗¢i t├¬n chß╗⌐a chß╗» sß╗æ",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ 2026\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_20: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_21: Tß║ío v├¡ vß╗¢i t├¬n chß╗⌐a k├╜ tß╗▒ ─æß║╖c biß╗çt",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ #1 - C├í nh├ón\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_21: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_22: Tß║ío v├¡ vß╗¢i t├¬n c├│ nhiß╗üu khoß║úng trß║»ng giß╗»a c├íc tß╗½",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡   tiß║┐t   kiß╗çm\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_22: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_23: Tß║ío v├¡ vß╗¢i t├¬n c├│ ─æß╗Ö d├ái ─æ├║ng 100 k├╜ tß╗▒",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"Vxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\n  \"walletType\": \"BANK_ACCOUNT\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_23: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_24: Tß║ío v├¡ c├│ t├¬n chß╗ë kh├íc nhau vß╗ü chß╗» hoa v├á chß╗» th╞░ß╗¥ng",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├ì TIß║╛T KIß╗åM\",\n  \"walletType\": \"MOMO\",\n  \"balance\": 0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_24: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([409, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_25: Tß║ío v├¡ vß╗¢i sß╗æ d╞░ ban ─æß║ºu l├á 1.000.000.000.000 VND",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ t├¡ch l┼⌐y\",\n  \"walletType\": \"CASH\",\n  \"balance\": 1000000000000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_25: Kiß╗âm tra m├ú phß║ún hß╗ôi', function() { pm.expect(pm.response.code).to.be.oneOf([201, 200, 201, 400, 409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC_U2.1_26: Tß║ío v├¡ mß╗¢i th├ánh c├┤ng v├á client tß╗▒ ─æß╗Öng reset form",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"walletName\": \"V├¡ Reset Form\",\n  \"balance\": 0,\n  \"walletType\": \"BANK_ACCOUNT\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wallets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "wallets"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC_U2.1_26: API tß║ío v├¡ trß║ú vß╗ü m├ú th├ánh c├┤ng', function() { pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 401]); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

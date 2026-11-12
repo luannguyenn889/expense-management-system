@@ -74,4 +74,29 @@ describe('WalletCreateForm', () => {
     expect(inputs[0].value).toBe('');
     expect(typeSelect.value).toBe('BANK_ACCOUNT');
   });
+
+  it('should reject balances above 9,999,999,999,999 VND', async () => {
+    const walletService = { createWallet: vi.fn() };
+    await TestBed.configureTestingModule({
+      imports: [WalletCreateForm],
+      providers: [{ provide: WalletService, useValue: walletService }],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(WalletCreateForm);
+    fixture.detectChanges();
+    const inputs = fixture.nativeElement.querySelectorAll('input');
+    inputs[0].value = 'Ví dự phòng';
+    inputs[0].dispatchEvent(new Event('input'));
+    inputs[1].value = '10000000000000';
+    inputs[1].dispatchEvent(new Event('input'));
+    fixture.nativeElement.querySelector('form').dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
+    fixture.detectChanges();
+
+    expect(walletService.createWallet).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain(
+      'Số dư không được vượt quá 9.999.999.999.999 đ.',
+    );
+  });
 });

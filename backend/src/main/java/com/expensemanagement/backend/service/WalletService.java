@@ -32,6 +32,10 @@ public class WalletService {
         if (initialBalance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Số dư không được âm");
         }
+        BigDecimal maxBalance = new BigDecimal("9999999999999.99");
+        if (initialBalance.compareTo(maxBalance) > 0) {
+            throw new IllegalArgumentException("Số dư ban đầu không được vượt quá 9.999.999.999.999 đ");
+        }
 
         String trimmedName = request.getWalletName().trim();
         String normalizedType = (request.getWalletType() != null && !request.getWalletType().isBlank())

@@ -1,5 +1,6 @@
 package com.expensemanagement.backend.DTO.request;
 
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -24,6 +25,7 @@ public class WalletCreateRequest {
     private String walletType;
 
     @DecimalMin(value = "0.00", message = "Số dư không được âm")
+    @DecimalMax(value = "9999999999999.99", message = "Số dư ban đầu không được vượt quá 9.999.999.999.999 đ")
     private BigDecimal balance;
 }
 

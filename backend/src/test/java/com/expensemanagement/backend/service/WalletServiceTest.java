@@ -173,6 +173,31 @@ class WalletServiceTest {
     }
 
     @Test
+    @DisplayName("Tạo ví với số dư vượt quá giới hạn CSDL (15,2) -> Thất bại qua Bean Validation và Service check")
+    void createWallet_withExcessiveBalance_shouldFailValidation() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("Ví Tiền Khổng Lồ")
+                .balance(new BigDecimal("10000000000000.00")) // 10 nghìn tỷ (14 chữ số phần nguyên)
+                .build();
+
+        // 2. Act (When) & 3. Assert (Then) Phía Bean Validation
+        Set<ConstraintViolation<WalletCreateRequest>> violations = validator.validate(request);
+        assertThat(violations).isNotEmpty();
+        assertThat(violations)
+                .extracting(ConstraintViolation::getMessage)
+                .contains("Số dư ban đầu không được vượt quá 9.999.999.999.999 đ");
+
+        // Đồng thời phía Service cũng ném IllegalArgumentException nếu dữ liệu quá lớn
+        assertThatThrownBy(() -> walletService.createWallet(userId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Số dư ban đầu không được vượt quá 9.999.999.999.999 đ");
+
+        verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
+    @Test
     @DisplayName("Tạo ví trùng cả tên ví và loại ví cho cùng người dùng -> Ném DuplicateResourceException (409)")
     void createWallet_withDuplicateNameAndType_shouldThrowDuplicateResourceException() {
         // 1. Arrange (Given)

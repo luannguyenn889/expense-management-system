@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Wallet } from '../../../core/models/wallet.model';
 import { WalletService } from '../../../core/services/wallet.service';
@@ -20,7 +21,7 @@ type WalletAction = 'deactivate' | 'delete';
 
 @Component({
   selector: 'app-wallet-list',
-  imports: [CurrencyVndPipe, WalletCreateForm],
+  imports: [CurrencyVndPipe, RouterLink, WalletCreateForm],
   templateUrl: './wallet-list.html',
   styleUrls: ['./wallet-list.css', './wallet-actions.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

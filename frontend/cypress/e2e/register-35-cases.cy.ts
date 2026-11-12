@@ -1,4 +1,4 @@
-describe('U1.1: E2E Automation Test - 31 Test Cases Đăng Ký Tài Khoản', () => {
+describe('U1.1: E2E Automation Test - 35 Test Cases Đăng Ký Tài Khoản', () => {
   beforeEach(() => {
     // Truy cập vào trang đăng ký trước mỗi ca kiểm thử
     cy.visit('/register');
@@ -530,5 +530,85 @@ describe('U1.1: E2E Automation Test - 31 Test Cases Đăng Ký Tài Khoản', ()
     // 4. Act & Assert: Nhấn biểu tượng con mắt lần nữa -> mật khẩu được ẩn trở lại (type="password")
     cy.get('#register-confirm-password').parent().find('.password-visibility-toggle').click();
     cy.get('#register-confirm-password').should('have.attr', 'type', 'password');
+  });
+
+  // TC_U1.1_32
+  it('TC_U1.1_32_register_withEmailContainingLeadingTrailingSpaces_shouldTrimAndRegister', () => {
+    // 1. Arrange (Given): Email có khoảng trắng ở đầu và cuối
+    const timestamp = Date.now();
+    cy.intercept('POST', '**/api/v1/users/register', (req) => {
+      expect(req.body.email).to.equal(`vana32_${timestamp}@gmail.com`);
+      req.reply({
+        statusCode: 201,
+        body: { code: 201, message: 'Đăng ký tài khoản thành công', data: { token: 'mock-token' } },
+      });
+    }).as('registerTrimEmail');
+
+    // 2. Act (When): Nhập email có khoảng trắng đầu/cuối
+    cy.get('input[formControlName="fullName"]').type('Nguyễn Văn A');
+    cy.get('input[formControlName="username"]').type(`nguyenvana32_${timestamp}`);
+    cy.get('input[formControlName="email"]').type(`   vana32_${timestamp}@gmail.com   `);
+    cy.get('input[formControlName="password"]').type('Test@123');
+    cy.get('input[formControlName="confirmPassword"]').type('Test@123');
+    cy.get('button[type="submit"]').click();
+
+    // 3. Assert (Then): Hệ thống tự động cắt khoảng trắng và đăng ký thành công
+    cy.wait('@registerTrimEmail');
+    cy.url().should('not.include', '/register');
+  });
+
+  // TC_U1.1_33
+  it('TC_U1.1_33_register_withCaseInsensitiveDuplicateUsername_shouldShowConflictError', () => {
+    // 1. Arrange (Given): Mock lỗi trùng tên đăng nhập khác hoa/thường
+    cy.intercept('POST', '**/api/v1/users/register', {
+      statusCode: 409,
+      body: { code: 409, message: 'Tên đăng nhập đã được sử dụng.' },
+    }).as('registerDupUserCase');
+
+    // 2. Act (When): Nhập username NguyenVanA khi nguyenvana đã tồn tại
+    cy.get('input[formControlName="fullName"]').type('Nguyễn Văn B');
+    cy.get('input[formControlName="username"]').type('NguyenVanA');
+    cy.get('input[formControlName="email"]').type(`nguyenvana35_${Date.now()}@gmail.com`);
+    cy.get('input[formControlName="password"]').type('Test@123');
+    cy.get('input[formControlName="confirmPassword"]').type('Test@123');
+    cy.get('button[type="submit"]').click();
+
+    // 3. Assert (Then): Hiển thị thông báo "Tên đăng nhập đã được sử dụng."
+    cy.wait('@registerDupUserCase');
+    cy.contains('Tên đăng nhập đã được sử dụng.').should('be.visible');
+  });
+
+  // TC_U1.1_34
+  it('TC_U1.1_34_register_withEmailMissingDomainPart_shouldShowFormatError', () => {
+    // 1. Arrange: Mock API báo lỗi định dạng email thiếu tên miền
+    cy.intercept('POST', '**/api/v1/users/register', {
+      statusCode: 400,
+      body: { code: 400, message: 'Email chưa đúng định dạng.' },
+    }).as('registerInvalidEmailDomain');
+
+    // 2. Act: Nhập email thiếu phần tên miền (abc@gmail) và submit
+    cy.get('input[formControlName="fullName"]').type('Nguyễn Văn A');
+    cy.get('input[formControlName="username"]').type(`nguyenvana33_${Date.now()}`);
+    cy.get('input[formControlName="email"]').type('abc@gmail');
+    cy.get('input[formControlName="password"]').type('Test@123');
+    cy.get('input[formControlName="confirmPassword"]').type('Test@123');
+    cy.get('button[type="submit"]').click();
+
+    // 3. Assert (Then): Hiển thị thông báo lỗi "Email chưa đúng định dạng."
+    cy.contains('Email chưa đúng định dạng.').should('be.visible');
+  });
+
+  // TC_U1.1_35
+  it('TC_U1.1_35_register_withEmailInvalidDomainSyntax_shouldShowFormatError', () => {
+    // 1. Arrange & Act: Nhập email có tên miền không hợp lệ (abc@.com)
+    cy.get('input[formControlName="fullName"]').type('Nguyễn Văn A');
+    cy.get('input[formControlName="username"]').type(`nguyenvana36_${Date.now()}`);
+    cy.get('input[formControlName="email"]').type('abc@.com');
+    cy.get('input[formControlName="password"]').type('Test@123');
+    cy.get('input[formControlName="confirmPassword"]').type('Test@123');
+    cy.get('button[type="submit"]').click();
+
+    // 2. Assert (Then): Hiển thị thông báo lỗi "Email chưa đúng định dạng."
+    cy.contains('Email chưa đúng định dạng.').should('be.visible');
   });
 });

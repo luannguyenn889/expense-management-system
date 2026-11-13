@@ -29,7 +29,12 @@ export class WalletCreateForm {
       'BANK_ACCOUNT',
       Validators.required,
     ),
-    balance: [0, [Validators.required, Validators.min(0), Validators.max(MAX_WALLET_BALANCE)]],
+    balance: this.formBuilder.control<number | null>(null, [
+        Validators.required,
+        Validators.min(0),
+        Validators.max(MAX_WALLET_BALANCE),
+      ]),
+    //balance: [0, [Validators.required, Validators.min(0), Validators.max(MAX_WALLET_BALANCE)]],
   });
 
   protected onSubmit(): void {
@@ -39,17 +44,22 @@ export class WalletCreateForm {
       return;
     }
 
-    const request = this.walletForm.getRawValue();
-    this.isLoading.set(true);
-    this.walletService
-      .createWallet({ ...request, walletName: request.walletName.trim() })
+const request = this.walletForm.getRawValue();
+this.isLoading.set(true);
+
+      this.walletService
+        .createWallet({
+          ...request,
+          walletName: request.walletName.trim(),
+          balance: request.balance!,
+        })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
         next: (wallet) => {
-          this.walletForm.reset({ walletName: '', walletType: 'BANK_ACCOUNT', balance: 0 });
+          this.walletForm.reset({ walletName: '', walletType: 'BANK_ACCOUNT', balance: null });
           this.walletCreated.emit(wallet);
         },
         error: (error: unknown) =>

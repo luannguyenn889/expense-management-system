@@ -18,7 +18,7 @@
   align-items: center;
   gap: 10px;
   color: #1d3125;
-  font: 800 20px 'Manrope', sans-serif;
+  font: 800 20px 'Be Vietnam Pro', sans-serif;
   text-decoration: none;
 }
 
@@ -76,7 +76,7 @@
 
 .page-heading h1 {
   margin: 0;
-  font: 800 32px 'Manrope', sans-serif;
+  font: 800 32px 'Be Vietnam Pro', sans-serif;
   letter-spacing: -1px;
 }
 
@@ -99,7 +99,7 @@
 
 .balance-summary strong {
   color: #20754b;
-  font: 800 22px 'Manrope', sans-serif;
+  font: 800 22px 'Be Vietnam Pro', sans-serif;
 }
 
 .wallet-layout {
@@ -128,7 +128,7 @@
 
 .panel-heading h2 {
   margin: 0;
-  font: 700 16px 'Manrope', sans-serif;
+  font: 700 16px 'Be Vietnam Pro', sans-serif;
 }
 
 .panel-heading p {
@@ -189,7 +189,7 @@
 
 .empty-state h3 {
   margin: 16px 0 5px;
-  font: 700 15px 'Manrope', sans-serif;
+  font: 700 15px 'Be Vietnam Pro', sans-serif;
 }
 
 .empty-state p,
@@ -408,7 +408,7 @@
 
 .balance-banner-copy strong {
   color: #192338;
-  font: 800 23px 'Manrope', sans-serif;
+  font: 800 23px 'Be Vietnam Pro', sans-serif;
   letter-spacing: -0.7px;
 }
 
@@ -556,4 +556,10 @@
   .wallet-balance {
     font-size: 10px;
   }
+
+  .wallet-item {
+    flex-wrap: wrap;
+    padding: 10px 0;
+  }
+
 }

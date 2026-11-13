@@ -1,0 +1,186 @@
+.wallet-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+}
+
+.wallet-action-button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 7px;
+  border: 1px solid #e3e8f0;
+  border-radius: 7px;
+  background: #fff;
+  color: #59677e;
+  cursor: pointer;
+  font: 600 9px 'Be Vietnam Pro', sans-serif;
+  white-space: nowrap;
+}
+
+.wallet-action-button:hover {
+  border-color: #c6d5f2;
+  background: #f5f8ff;
+  color: #2864e8;
+}
+
+.wallet-action-button .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.wallet-delete-button {
+  color: #a64e4a;
+}
+
+.wallet-delete-button:hover {
+  border-color: #f0c9c6;
+  background: #fff6f5;
+  color: #b42318;
+}
+
+.wallet-dialog-backdrop {
+  position: fixed;
+  z-index: 1000;
+  display: grid;
+  padding: 20px;
+  background: rgb(20 30 48 / 45%);
+  inset: 0;
+  place-items: center;
+}
+
+.wallet-action-dialog {
+  width: min(100%, 420px);
+  padding: 24px;
+  border: 1px solid #e8ebf2;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(22 35 58 / 20%);
+  color: #526078;
+}
+
+.wallet-dialog-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 12px;
+  background: #edf3ff;
+  color: #346fe7;
+  font-size: 22px;
+}
+
+.wallet-dialog-icon-danger {
+  background: #fff0ef;
+  color: #b42318;
+}
+
+.wallet-action-dialog h2 {
+  margin: 16px 0 5px;
+  color: #273248;
+  font: 700 17px 'Be Vietnam Pro', sans-serif;
+}
+
+.wallet-action-dialog p {
+  margin: 9px 0 0;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.wallet-action-dialog .wallet-dialog-wallet-name {
+  margin-top: 0;
+  color: #28334a;
+  font-weight: 700;
+}
+
+.wallet-dialog-error {
+  padding: 9px 10px;
+  border: 1px solid #f0c9c6;
+  border-radius: 8px;
+  background: #fff6f5;
+  color: #a43832;
+}
+
+.wallet-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.wallet-dialog-actions button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 11px;
+  border: 1px solid #e0e5ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #526078;
+  cursor: pointer;
+  font: 600 10px 'Be Vietnam Pro', sans-serif;
+}
+
+.wallet-dialog-actions .wallet-dialog-confirm {
+  border-color: #2864e8;
+  background: #2864e8;
+  color: #fff;
+}
+
+.wallet-dialog-actions .wallet-dialog-confirm:hover:not(:disabled) {
+  border-color: #1d55d8;
+  background: #1d55d8;
+}
+
+.wallet-dialog-actions .wallet-dialog-confirm-danger {
+  border-color: #b42318;
+  background: #b42318;
+}
+
+.wallet-dialog-actions .wallet-dialog-confirm-danger:hover:not(:disabled) {
+  border-color: #912018;
+  background: #912018;
+}
+
+.wallet-dialog-actions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.wallet-dialog-confirm .material-symbols-outlined {
+  font-size: 15px;
+}
+
+@media (max-width: 520px) {
+  .wallet-item {
+    flex-wrap: wrap;
+    padding: 10px 0;
+  }
+
+  .wallet-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .wallet-action-button {
+    min-height: 34px;
+    padding: 0 9px;
+    font-size: 10px;
+  }
+
+  .wallet-action-dialog {
+    padding: 20px;
+  }
+
+  .wallet-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .wallet-dialog-actions button {
+    width: 100%;
+  }
+}

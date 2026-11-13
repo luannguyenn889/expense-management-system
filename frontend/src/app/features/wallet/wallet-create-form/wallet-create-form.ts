@@ -6,6 +6,8 @@ import { WalletService } from '../../../core/services/wallet.service';
 import { Wallet } from '../../../core/models/wallet.model';
 import { getErrorMessage } from '../../../core/utils/error-message.util';
 
+const MAX_WALLET_BALANCE = 9_999_999_999_999;
+
 @Component({
   selector: 'app-wallet-create-form',
   imports: [ReactiveFormsModule],
@@ -27,7 +29,7 @@ export class WalletCreateForm {
       'BANK_ACCOUNT',
       Validators.required,
     ),
-    balance: [0, [Validators.required, Validators.min(0)]],
+    balance: [0, [Validators.required, Validators.min(0), Validators.max(MAX_WALLET_BALANCE)]],
   });
 
   protected onSubmit(): void {

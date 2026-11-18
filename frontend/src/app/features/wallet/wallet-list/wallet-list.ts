@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Wallet } from '../../../core/models/wallet.model';
 import { WalletService } from '../../../core/services/wallet.service';
@@ -21,7 +21,7 @@ type WalletAction = 'deactivate' | 'delete';
 
 @Component({
   selector: 'app-wallet-list',
-  imports: [CurrencyVndPipe, WalletCreateForm],
+  imports: [CurrencyVndPipe, WalletCreateForm, RouterLink],
   templateUrl: './wallet-list.html',
   styleUrls: ['./wallet-list.css', './wallet-actions.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,8 +69,42 @@ export class WalletList implements OnInit {
     this.loadWallets();
   }
 
-  protected onLogout(): void {
-    this.authService.logout();
-    void this.router.navigateByUrl('/login');
+  protected openWalletAction(wallet: Wallet, action: WalletAction): void {
+    this.walletActionError.set('');
+    this.pendingWalletAction.set({ wallet, action });
+  }
+
+  protected closeWalletAction(): void {
+    this.pendingWalletAction.set(null);
+    this.walletActionError.set('');
+  }
+
+  protected confirmWalletAction(): void {
+    const pending = this.pendingWalletAction();
+    if (!pending) return;
+
+    this.isWalletActionLoading.set(true);
+    this.walletActionError.set('');
+
+    const action$ =
+      pending.action === 'delete'
+        ? this.walletService.deleteWallet(pending.wallet.walletId)
+        : this.walletService.deactivateWallet(pending.wallet.walletId);
+
+    action$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isWalletActionLoading.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          this.pendingWalletAction.set(null);
+          this.loadWallets();
+        },
+        error: (error: unknown) =>
+          this.walletActionError.set(
+            getErrorMessage(error, 'Thao tác thất bại. Vui lòng thử lại.'),
+          ),
+      });
   }
 }

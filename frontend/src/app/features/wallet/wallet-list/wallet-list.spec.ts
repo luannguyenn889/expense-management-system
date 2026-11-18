@@ -30,6 +30,9 @@ describe('WalletList', () => {
 
     expect(walletService.getWallets).toHaveBeenCalledOnce();
     expect(fixture.nativeElement.textContent).toContain('Bạn chưa có ví nào');
+    const homeLink = fixture.nativeElement.querySelector('.wallet-add-action') as HTMLAnchorElement;
+    expect(homeLink.textContent).toContain('Về trang chủ');
+    expect(homeLink.getAttribute('href')).toBe('/dashboard');
   });
 
   it('should render wallets and format their balances', async () => {

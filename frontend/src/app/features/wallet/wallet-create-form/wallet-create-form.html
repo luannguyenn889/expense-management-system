@@ -46,6 +46,7 @@
           formControlName="balance"
           type="number"
           min="0"
+          max="9999999999999"
           step="1000"
           inputmode="numeric"
           aria-describedby="wallet-balance-unit"
@@ -55,6 +56,8 @@
       </div>
       @if (walletForm.controls.balance.touched && walletForm.controls.balance.hasError('min')) {
         <small class="field-error">Số dư không được nhỏ hơn 0.</small>
+      } @else if (walletForm.controls.balance.touched && walletForm.controls.balance.hasError('max')) {
+        <small class="field-error">Số dư không được vượt quá 9.999.999.999.999 đ.</small>
       }
     </label>
 

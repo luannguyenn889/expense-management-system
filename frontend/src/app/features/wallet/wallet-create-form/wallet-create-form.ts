@@ -23,6 +23,8 @@ export class WalletCreateForm {
   readonly walletCreated = output<Wallet>();
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly balanceDisplay = signal('');
+
   protected readonly walletForm = this.formBuilder.nonNullable.group({
     walletName: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
     walletType: this.formBuilder.nonNullable.control<'BANK_ACCOUNT' | 'CASH' | 'MOMO'>(
@@ -30,11 +32,31 @@ export class WalletCreateForm {
       Validators.required,
     ),
     balance: this.formBuilder.control<number | null>(null, [
-        Validators.required,
-        Validators.min(0),
-        Validators.max(MAX_WALLET_BALANCE),
-      ]),
+      Validators.required,
+      Validators.min(0),
+      Validators.max(MAX_WALLET_BALANCE),
+    ]),
   });
+
+  protected onBalanceInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    // Xóa toàn bộ ký tự không phải chữ số (bao gồm dấu chấm, dấu phẩy, chữ cái)
+    const digitsOnly = input.value.replace(/\D/g, '');
+
+    if (!digitsOnly) {
+      this.balanceDisplay.set('');
+      input.value = '';
+      this.walletForm.controls.balance.setValue(null);
+      return;
+    }
+
+    const numericValue = Number(digitsOnly);
+    const formatted = numericValue.toLocaleString('vi-VN');
+
+    this.balanceDisplay.set(formatted);
+    input.value = formatted; // Ép lại DOM value ngay lập tức nếu user gõ ký tự chữ hoặc nhiều dấu chấm liên tiếp
+    this.walletForm.controls.balance.setValue(numericValue);
+  }
 
   protected onSubmit(): void {
     this.errorMessage.set('');
@@ -43,15 +65,15 @@ export class WalletCreateForm {
       return;
     }
 
-const request = this.walletForm.getRawValue();
-this.isLoading.set(true);
+    const request = this.walletForm.getRawValue();
+    this.isLoading.set(true);
 
-      this.walletService
-        .createWallet({
-          ...request,
-          walletName: request.walletName.trim(),
-          balance: request.balance!,
-        })
+    this.walletService
+      .createWallet({
+        ...request,
+        walletName: request.walletName.trim(),
+        balance: request.balance!,
+      })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
@@ -59,6 +81,7 @@ this.isLoading.set(true);
       .subscribe({
         next: (wallet) => {
           this.walletForm.reset({ walletName: '', walletType: 'BANK_ACCOUNT', balance: null });
+          this.balanceDisplay.set('');
           this.walletCreated.emit(wallet);
         },
         error: (error: unknown) =>

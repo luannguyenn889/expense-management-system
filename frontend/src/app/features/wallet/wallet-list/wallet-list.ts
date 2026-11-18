@@ -21,7 +21,7 @@ type WalletAction = 'deactivate' | 'delete';
 
 @Component({
   selector: 'app-wallet-list',
-  imports: [CurrencyVndPipe, RouterLink, WalletCreateForm],
+  imports: [CurrencyVndPipe, WalletCreateForm, RouterLink],
   templateUrl: './wallet-list.html',
   styleUrls: ['./wallet-list.css', './wallet-actions.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,27 +75,23 @@ export class WalletList implements OnInit {
   }
 
   protected closeWalletAction(): void {
-    if (this.isWalletActionLoading()) {
-      return;
-    }
     this.pendingWalletAction.set(null);
     this.walletActionError.set('');
   }
 
   protected confirmWalletAction(): void {
     const pending = this.pendingWalletAction();
-    if (!pending || this.isWalletActionLoading()) {
-      return;
-    }
+    if (!pending) return;
 
-    this.walletActionError.set('');
     this.isWalletActionLoading.set(true);
-    const request =
-      pending.action === 'deactivate'
-        ? this.walletService.deactivateWallet(pending.wallet.walletId)
-        : this.walletService.deleteWallet(pending.wallet.walletId);
+    this.walletActionError.set('');
 
-    request
+    const action$ =
+      pending.action === 'delete'
+        ? this.walletService.deleteWallet(pending.wallet.walletId)
+        : this.walletService.deactivateWallet(pending.wallet.walletId);
+
+    action$
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isWalletActionLoading.set(false)),
@@ -105,15 +101,10 @@ export class WalletList implements OnInit {
           this.pendingWalletAction.set(null);
           this.loadWallets();
         },
-        error: (error: unknown) => {
-          const actionLabel = pending.action === 'deactivate' ? 'ngừng sử dụng' : 'xóa';
+        error: (error: unknown) =>
           this.walletActionError.set(
-            getErrorMessage(
-              error,
-              `Không thể ${actionLabel} ví. Backend có thể chưa hỗ trợ API này hoặc hiện không khả dụng.`,
-            ),
-          );
-        },
+            getErrorMessage(error, 'Thao tác thất bại. Vui lòng thử lại.'),
+          ),
       });
   }
 }

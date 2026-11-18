@@ -39,22 +39,25 @@
       </select>
     </label>
 
-    <label class="field">
+<label class="field">
       <span>Số dư ban đầu</span>
       <div class="amount-input">
         <input
-          formControlName="balance"
-          type="number"
-          min="0"
-          max="9999999999999"
-          step="1000"
+          type="text"
           inputmode="numeric"
+          autocomplete="off"
+          placeholder="0"
+          [value]="balanceDisplay()"
+          (input)="onBalanceInput($event)"
+          (blur)="walletForm.controls.balance.markAsTouched()"
           aria-describedby="wallet-balance-unit"
           [attr.aria-invalid]="walletForm.controls.balance.invalid && walletForm.controls.balance.touched"
         />
         <span id="wallet-balance-unit">VND</span>
       </div>
-      @if (walletForm.controls.balance.touched && walletForm.controls.balance.hasError('min')) {
+      @if (walletForm.controls.balance.touched && walletForm.controls.balance.hasError('required')) {
+        <small class="field-error">Vui lòng nhập số dư ban đầu.</small>
+      } @else if (walletForm.controls.balance.touched && walletForm.controls.balance.hasError('min')) {
         <small class="field-error">Số dư không được nhỏ hơn 0.</small>
       } @else if (walletForm.controls.balance.touched && walletForm.controls.balance.hasError('max')) {
         <small class="field-error">Số dư không được vượt quá 9.999.999.999.999 đ.</small>

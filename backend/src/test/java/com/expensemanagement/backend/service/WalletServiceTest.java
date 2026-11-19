@@ -603,6 +603,111 @@ class WalletServiceTest {
         assertThat(validator.validate(maxReq)).isEmpty();
     }
 
+    @Test
+    @DisplayName("Biên sát nút số dư âm (-0.01) -> Thất bại qua Bean Validation và Service check")
+    void createWallet_withSlightlyNegativeBalance_shouldFailValidation() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("Ví Âm Nhẹ")
+                .balance(new BigDecimal("-0.01"))
+                .build();
+
+        // 2. Act (When) & 3. Assert (Then)
+        Set<ConstraintViolation<WalletCreateRequest>> violations = validator.validate(request);
+        assertThat(violations)
+                .extracting(ConstraintViolation::getMessage)
+                .contains("Số dư không được âm");
+
+        assertThatThrownBy(() -> walletService.createWallet(userId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Số dư không được âm");
+
+        verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
+    @Test
+    @DisplayName("Biên vượt ngưỡng tối đa chỉ 0.01 (10000000000000.00) -> Thất bại cả Bean Validation và Service")
+    void createWallet_withBalanceJustOverMaxLimit_shouldFailValidation() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("Ví Vượt 1 Xu")
+                .balance(new BigDecimal("10000000000000.00"))
+                .build();
+
+        // 2. Act (When) & 3. Assert (Then)
+        Set<ConstraintViolation<WalletCreateRequest>> violations = validator.validate(request);
+        assertThat(violations)
+                .extracting(ConstraintViolation::getMessage)
+                .contains("Số dư ban đầu không được vượt quá 9.999.999.999.999 đ");
+
+        assertThatThrownBy(() -> walletService.createWallet(userId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Số dư ban đầu không được vượt quá 9.999.999.999.999 đ");
+
+        verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
+    @Test
+    @DisplayName("Tạo ví với tên tiếng Việt có dấu và khoảng trắng -> Giữ nguyên dấu tiếng Việt sau khi trim")
+    void createWallet_withVietnameseAccentsAndSpaces_shouldPreserveAccentsAfterTrim() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("  Quỹ Dự Phòng Khẩn Cấp 2026  ")
+                .walletType("BANK_ACCOUNT")
+                .balance(new BigDecimal("1000000.00"))
+                .build();
+
+        when(walletRepository.existsByUserIdAndWalletNameIgnoreCaseAndWalletType(
+                userId, "Quỹ Dự Phòng Khẩn Cấp 2026", "BANK_ACCOUNT")).thenReturn(false);
+
+        ArgumentCaptor<Wallet> walletCaptor = ArgumentCaptor.forClass(Wallet.class);
+        when(walletRepository.save(walletCaptor.capture())).thenAnswer(inv -> {
+            Wallet w = inv.getArgument(0);
+            w.setWalletId(108L);
+            return w;
+        });
+
+        // 2. Act (When)
+        WalletResponse response = walletService.createWallet(userId, request);
+
+        // 3. Assert (Then)
+        assertThat(walletCaptor.getValue().getWalletName()).isEqualTo("Quỹ Dự Phòng Khẩn Cấp 2026");
+        assertThat(response.getWalletName()).isEqualTo("Quỹ Dự Phòng Khẩn Cấp 2026");
+    }
+
+    @Test
+    @DisplayName("Tạo ví với số dư có phần thập phân (1500.50) -> Lưu và trả về chính xác không làm tròn")
+    void createWallet_withDecimalBalance_shouldPreserveExactScale() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        BigDecimal exactBalance = new BigDecimal("1500.50");
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("Ví Thập Phân")
+                .walletType("CASH")
+                .balance(exactBalance)
+                .build();
+
+        when(walletRepository.existsByUserIdAndWalletNameIgnoreCaseAndWalletType(userId, "Ví Thập Phân", "CASH"))
+                .thenReturn(false);
+
+        ArgumentCaptor<Wallet> walletCaptor = ArgumentCaptor.forClass(Wallet.class);
+        when(walletRepository.save(walletCaptor.capture())).thenAnswer(inv -> {
+            Wallet w = inv.getArgument(0);
+            w.setWalletId(109L);
+            return w;
+        });
+
+        // 2. Act (When)
+        WalletResponse response = walletService.createWallet(userId, request);
+
+        // 3. Assert (Then)
+        assertThat(walletCaptor.getValue().getBalance()).isEqualByComparingTo("1500.50");
+        assertThat(response.getBalance()).isEqualByComparingTo("1500.50");
+    }
+
     // =========================================================================
     // US5 [CNTT46-41]: UNIT TEST CHO CHỨC NĂNG XEM DANH SÁCH VÍ
     // =========================================================================

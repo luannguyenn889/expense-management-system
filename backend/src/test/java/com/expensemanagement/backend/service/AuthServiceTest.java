@@ -739,4 +739,72 @@ class AuthServiceTest {
                 .extracting(ConstraintViolation::getMessage)
                 .contains("ID Token của Google không được để trống");
     }
+
+    @Test
+    @DisplayName("LoginRequest.getIdentifier() khi usernameOrEmail null -> Ưu tiên username trước email")
+    void loginRequest_getIdentifier_whenUsernameOrEmailNull_shouldPrioritizeUsernameOverEmail() {
+        // 1. Arrange (Given)
+        LoginRequest request = LoginRequest.builder()
+                .usernameOrEmail(null)
+                .username("  myusername  ")
+                .email("myemail@example.com")
+                .password("Password123@")
+                .build();
+
+        // 2. Act (When)
+        String identifier = request.getIdentifier();
+
+        // 3. Assert (Then)
+        assertThat(identifier).isEqualTo("myusername");
+    }
+
+    @Test
+    @DisplayName("LoginRequest.getIdentifier() khi cả 3 trường đều rỗng/khoảng trắng -> Trả về null")
+    void loginRequest_getIdentifier_whenAllFieldsBlank_shouldReturnNull() {
+        // 1. Arrange (Given)
+        LoginRequest request = LoginRequest.builder()
+                .usernameOrEmail("   ")
+                .username("")
+                .email("  ")
+                .password("Password123@")
+                .build();
+
+        // 2. Act (When)
+        String identifier = request.getIdentifier();
+
+        // 3. Assert (Then)
+        assertThat(identifier).isNull();
+    }
+
+    @Test
+    @DisplayName("Đăng nhập Google lần đầu khi prefix email toàn ký tự đặc biệt -> Fallback thành user_")
+    void loginWithGoogle_whenEmailPrefixOnlySpecialChars_shouldFallbackToUserPrefix() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.token.dots";
+        String email = "...@gmail.com";
+
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail(email);
+        payload.set("name", "Special User");
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("user_")).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$hash");
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.save(userCaptor.capture())).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setUserId(34L);
+            return u;
+        });
+
+        // 2. Act (When)
+        authService.loginWithGoogle(GoogleLoginRequest.builder().idToken(rawGoogleToken).build());
+
+        // 3. Assert (Then)
+        assertThat(userCaptor.getValue().getUsername()).isEqualTo("user_");
+    }
 }

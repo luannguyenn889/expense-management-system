@@ -807,4 +807,100 @@ class AuthServiceTest {
         // 3. Assert (Then)
         assertThat(userCaptor.getValue().getUsername()).isEqualTo("user_");
     }
+
+    @Test
+    @DisplayName("Đăng nhập với mật khẩu toàn khoảng trắng -> passwordEncoder không khớp -> Ném UnauthorizedException")
+    void login_withWhitespaceOnlyPassword_shouldThrowUnauthorizedException() {
+        // 1. Arrange (Given)
+        String email = "user@example.com";
+        String whitespacePassword = "    ";
+        String encodedHash = "$2a$10$hashedPasswordValue";
+
+        User mockUser = User.builder()
+                .userId(1L)
+                .username("nguyenvana")
+                .email(email)
+                .passwordHash(encodedHash)
+                .build();
+
+        LoginRequest request = LoginRequest.builder()
+                .email(email)
+                .password(whitespacePassword)
+                .build();
+
+        when(userRepository.findByEmailOrUsername(email, email)).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(whitespacePassword, encodedHash)).thenReturn(false);
+
+        // 2. Act (When) & 3. Assert (Then)
+        assertThatThrownBy(() -> authService.login(request))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("Email hoặc mật khẩu không chính xác");
+
+        verify(passwordEncoder, times(1)).matches(whitespacePassword, encodedHash);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập Google với user đã tồn tại -> Không gọi save() và không gọi passwordEncoder.encode()")
+    void loginWithGoogle_whenExistingUser_shouldNotCallSaveOrEncodePassword() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.google.existing";
+        String googleEmail = "existing.google@gmail.com";
+
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail(googleEmail);
+        payload.set("name", "Existing Google");
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        User existingUser = User.builder()
+                .userId(50L)
+                .username("existinggoogle")
+                .fullName("Existing Google")
+                .email(googleEmail)
+                .passwordHash("$2a$10$existing")
+                .build();
+        when(userRepository.findByEmail(googleEmail)).thenReturn(Optional.of(existingUser));
+
+        // 2. Act (When)
+        authService.loginWithGoogle(GoogleLoginRequest.builder().idToken(rawGoogleToken).build());
+
+        // 3. Assert (Then)
+        verify(userRepository, never()).save(any(User.class));
+        verify(passwordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("Đăng nhập Google lần đầu (JIT) -> Phải băm mật khẩu ngẫu nhiên khác rỗng qua passwordEncoder trước khi lưu")
+    void loginWithGoogle_whenNewUserCreated_shouldEncodeNonEmptyRandomPassword() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.google.jit";
+        String googleEmail = "jit.user@gmail.com";
+
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail(googleEmail);
+        payload.set("name", "JIT User");
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        when(userRepository.findByEmail(googleEmail)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("jituser")).thenReturn(false);
+
+        ArgumentCaptor<String> rawPasswordCaptor = ArgumentCaptor.forClass(String.class);
+        when(passwordEncoder.encode(rawPasswordCaptor.capture())).thenReturn("$2a$10$encodedRandom");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setUserId(51L);
+            return u;
+        });
+
+        // 2. Act (When)
+        authService.loginWithGoogle(GoogleLoginRequest.builder().idToken(rawGoogleToken).build());
+
+        // 3. Assert (Then)
+        assertThat(rawPasswordCaptor.getValue()).isNotBlank();
+        verify(passwordEncoder, times(1)).encode(anyString());
+        verify(userRepository, times(1)).save(any(User.class));
+    }
 }

@@ -238,4 +238,40 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(loginReq)))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("POST /api/v1/auth/login với JSON sai cú pháp -> Trả về JSON lỗi có message")
+    void login_withMalformedJsonBody_shouldReturnErrorResponse() throws Exception {
+        // 1. Arrange, 2. Act & 3. Assert
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": "))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.code").value(500))
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/auth/login với Content-Type text/plain -> Trả về JSON lỗi có message")
+    void login_withUnsupportedContentType_shouldReturnErrorResponse() throws Exception {
+        // 1. Arrange, 2. Act & 3. Assert
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content("plain text body"))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.code").value(500))
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/auth/google với body rỗng {} -> Trả về HTTP 400 Bad Request")
+    void loginWithGoogle_withEmptyJsonBody_shouldReturn400BadRequest() throws Exception {
+        // 1. Arrange, 2. Act & 3. Assert
+        mockMvc.perform(post("/api/v1/auth/google")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("ID Token của Google không được để trống"));
+    }
 }

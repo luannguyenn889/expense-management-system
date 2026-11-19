@@ -178,4 +178,129 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.code").value(409))
                 .andExpect(jsonPath("$.message").value("Ví có cùng tên và loại đã tồn tại trong tài khoản của bạn"));
     }
+
+    @Test
+    @DisplayName("POST /api/v1/wallets với walletName > 100 ký tự -> Trả về HTTP 400 Bad Request")
+    void createWallet_withWalletNameExceeding100Chars_shouldReturn400BadRequest() throws Exception {
+        // 1. Arrange (Given)
+        String token = jwtTokenProvider.generateToken(1L);
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("W".repeat(101))
+                .balance(BigDecimal.ZERO)
+                .build();
+
+        // 2. Act (When) & 3. Assert (Then)
+        mockMvc.perform(post("/api/v1/wallets")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("Tên ví tối đa 100 ký tự"));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/wallets với walletType > 30 ký tự -> Trả về HTTP 400 Bad Request")
+    void createWallet_withWalletTypeExceeding30Chars_shouldReturn400BadRequest() throws Exception {
+        // 1. Arrange (Given)
+        String token = jwtTokenProvider.generateToken(1L);
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("Ví Hợp Lệ")
+                .walletType("T".repeat(31))
+                .balance(BigDecimal.ZERO)
+                .build();
+
+        // 2. Act (When) & 3. Assert (Then)
+        mockMvc.perform(post("/api/v1/wallets")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("Loại ví tối đa 30 ký tự"));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/wallets với balance null -> Hợp lệ và trả về HTTP 201 Created")
+    void createWallet_withNullBalance_shouldReturn201Created() throws Exception {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        String token = jwtTokenProvider.generateToken(userId);
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("Ví Không Nhập Tiền")
+                .walletType("CASH")
+                .balance(null)
+                .build();
+
+        WalletResponse mockResponse = WalletResponse.builder()
+                .walletId(22L)
+                .userId(userId)
+                .walletName("Ví Không Nhập Tiền")
+                .walletType("CASH")
+                .balance(BigDecimal.ZERO)
+                .isActive(true)
+                .build();
+
+        when(walletService.createWallet(eq(userId), any(WalletCreateRequest.class))).thenReturn(mockResponse);
+
+        // 2. Act (When) & 3. Assert (Then)
+        mockMvc.perform(post("/api/v1/wallets")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value(201))
+                .andExpect(jsonPath("$.data.balance").value(0));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/wallets với balance có số thập phân -> Hợp lệ và giữ nguyên số thập phân")
+    void createWallet_withDecimalBalance_shouldReturn201Created() throws Exception {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        String token = jwtTokenProvider.generateToken(userId);
+        BigDecimal decimalBalance = new BigDecimal("12345.67");
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("Ví Thập Phân")
+                .walletType("MOMO")
+                .balance(decimalBalance)
+                .build();
+
+        WalletResponse mockResponse = WalletResponse.builder()
+                .walletId(23L)
+                .userId(userId)
+                .walletName("Ví Thập Phân")
+                .walletType("MOMO")
+                .balance(decimalBalance)
+                .isActive(true)
+                .build();
+
+        when(walletService.createWallet(eq(userId), any(WalletCreateRequest.class))).thenReturn(mockResponse);
+
+        // 2. Act (When) & 3. Assert (Then)
+        mockMvc.perform(post("/api/v1/wallets")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value(201))
+                .andExpect(jsonPath("$.data.balance").value(12345.67));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/wallets với JWT sai chữ ký / không hợp lệ -> Bị chặn với HTTP 403 Forbidden")
+    void createWallet_withInvalidJwtToken_shouldReturn403Forbidden() throws Exception {
+        // 1. Arrange (Given)
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("Ví Token Giả")
+                .balance(BigDecimal.ZERO)
+                .build();
+
+        // 2. Act (When) & 3. Assert (Then)
+        mockMvc.perform(post("/api/v1/wallets")
+                        .header("Authorization", "Bearer invalid.jwt.signature")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+    }
 }

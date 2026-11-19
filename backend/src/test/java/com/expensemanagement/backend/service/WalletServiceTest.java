@@ -818,4 +818,139 @@ class WalletServiceTest {
 
         verifyNoInteractions(walletRepository);
     }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Map đầy đủ tất cả các trường WalletResponse (walletType, createdAt, updatedAt)")
+    void getWalletsByUser_shouldMapAllResponseFieldsCorrectly() {
+        // 1. Arrange (Given)
+        Long userId = 5L;
+        LocalDateTime createdAt = LocalDateTime.of(2026, 11, 1, 9, 0);
+        LocalDateTime updatedAt = LocalDateTime.of(2026, 11, 5, 14, 30);
+
+        Wallet wallet = Wallet.builder()
+                .walletId(101L)
+                .userId(userId)
+                .walletName("Ví Vietcombank")
+                .walletType("BANK_ACCOUNT")
+                .balance(new BigDecimal("1250000.50"))
+                .isActive(true)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .build();
+
+        when(walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId))
+                .thenReturn(List.of(wallet));
+
+        // 2. Act (When)
+        List<WalletResponse> result = walletService.getWalletsByUser(userId);
+
+        // 3. Assert (Then)
+        assertThat(result).hasSize(1);
+        WalletResponse res = result.get(0);
+        assertThat(res.getWalletId()).isEqualTo(101L);
+        assertThat(res.getUserId()).isEqualTo(userId);
+        assertThat(res.getWalletName()).isEqualTo("Ví Vietcombank");
+        assertThat(res.getWalletType()).isEqualTo("BANK_ACCOUNT");
+        assertThat(res.getBalance()).isEqualByComparingTo("1250000.50");
+        assertThat(res.getIsActive()).isTrue();
+        assertThat(res.getCreatedAt()).isEqualTo(createdAt);
+        assertThat(res.getUpdatedAt()).isEqualTo(updatedAt);
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Ví có số dư biên 0.00 -> Giữ nguyên giá trị 0.00 khi trả về")
+    void getWalletsByUser_withZeroBalanceWallet_shouldReturnExactZeroBalance() {
+        // 1. Arrange (Given)
+        Long userId = 6L;
+        Wallet zeroWallet = Wallet.builder()
+                .walletId(102L)
+                .userId(userId)
+                .walletName("Ví Trống")
+                .walletType("CASH")
+                .balance(new BigDecimal("0.00"))
+                .isActive(true)
+                .build();
+
+        when(walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId))
+                .thenReturn(List.of(zeroWallet));
+
+        // 2. Act (When)
+        List<WalletResponse> result = walletService.getWalletsByUser(userId);
+
+        // 3. Assert (Then)
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getBalance()).isEqualByComparingTo("0.00");
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Ví có số dư biên tối đa 9.999.999.999.999,99 -> Giữ nguyên độ chính xác BigDecimal")
+    void getWalletsByUser_withMaxBoundaryBalance_shouldPreserveExactPrecision() {
+        // 1. Arrange (Given)
+        Long userId = 7L;
+        BigDecimal maxBalance = new BigDecimal("9999999999999.99");
+        Wallet maxWallet = Wallet.builder()
+                .walletId(103L)
+                .userId(userId)
+                .walletName("Ví Tài Sản Lớn")
+                .walletType("BANK_ACCOUNT")
+                .balance(maxBalance)
+                .isActive(true)
+                .build();
+
+        when(walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId))
+                .thenReturn(List.of(maxWallet));
+
+        // 2. Act (When)
+        List<WalletResponse> result = walletService.getWalletsByUser(userId);
+
+        // 3. Assert (Then)
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getBalance()).isEqualByComparingTo(maxBalance);
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Người dùng sở hữu nhiều loại ví khác nhau (CASH, BANK_ACCOUNT, MOMO, CREDIT_CARD) -> Trả đủ danh sách")
+    void getWalletsByUser_withMultipleWalletTypes_shouldReturnAllTypes() {
+        // 1. Arrange (Given)
+        Long userId = 8L;
+        List<Wallet> wallets = List.of(
+                Wallet.builder().walletId(1L).userId(userId).walletName("Tiền mặt").walletType("CASH").balance(new BigDecimal("100000.00")).isActive(true).build(),
+                Wallet.builder().walletId(2L).userId(userId).walletName("Ngân hàng").walletType("BANK_ACCOUNT").balance(new BigDecimal("500000.00")).isActive(true).build(),
+                Wallet.builder().walletId(3L).userId(userId).walletName("Ví MoMo").walletType("MOMO").balance(new BigDecimal("250000.00")).isActive(true).build(),
+                Wallet.builder().walletId(4L).userId(userId).walletName("Thẻ tín dụng").walletType("CREDIT_CARD").balance(new BigDecimal("300000.00")).isActive(true).build()
+        );
+
+        when(walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId)).thenReturn(wallets);
+
+        // 2. Act (When)
+        List<WalletResponse> result = walletService.getWalletsByUser(userId);
+
+        // 3. Assert (Then)
+        assertThat(result).hasSize(4);
+        assertThat(result)
+                .extracting(WalletResponse::getWalletType)
+                .containsExactly("CASH", "BANK_ACCOUNT", "MOMO", "CREDIT_CARD");
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: Giữ nguyên thứ tự giảm dần (ví mới nhất lên đầu) trả về từ Repository")
+    void getWalletsByUser_shouldPreserveDescendingOrderFromRepository() {
+        // 1. Arrange (Given)
+        Long userId = 9L;
+        LocalDateTime now = LocalDateTime.now();
+        Wallet w3 = Wallet.builder().walletId(30L).userId(userId).walletName("Ví Mới Nhất").walletType("CASH").balance(BigDecimal.TEN).isActive(true).createdAt(now).build();
+        Wallet w2 = Wallet.builder().walletId(20L).userId(userId).walletName("Ví Thứ Hai").walletType("CASH").balance(BigDecimal.TEN).isActive(true).createdAt(now.minusHours(5)).build();
+        Wallet w1 = Wallet.builder().walletId(10L).userId(userId).walletName("Ví Cũ Nhất").walletType("CASH").balance(BigDecimal.TEN).isActive(true).createdAt(now.minusDays(2)).build();
+
+        when(walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(userId))
+                .thenReturn(List.of(w3, w2, w1));
+
+        // 2. Act (When)
+        List<WalletResponse> result = walletService.getWalletsByUser(userId);
+
+        // 3. Assert (Then)
+        assertThat(result)
+                .extracting(WalletResponse::getWalletId)
+                .containsExactly(30L, 20L, 10L);
+    }
 }

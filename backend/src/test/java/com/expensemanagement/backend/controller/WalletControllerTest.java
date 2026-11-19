@@ -303,4 +303,36 @@ class WalletControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @DisplayName("POST /api/v1/wallets với body JSON rỗng {} -> Trả về HTTP 400 Bad Request")
+    void createWallet_withEmptyJsonBody_shouldReturn400BadRequest() throws Exception {
+        // 1. Arrange (Given)
+        String token = jwtTokenProvider.generateToken(1L);
+
+        // 2. Act (When) & 3. Assert (Then)
+        mockMvc.perform(post("/api/v1/wallets")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("Tên ví không được để trống"));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/wallets với JSON sai cú pháp -> GlobalExceptionHandler bắt lỗi và trả về JSON có message")
+    void createWallet_withMalformedJson_shouldReturnErrorResponse() throws Exception {
+        // 1. Arrange (Given)
+        String token = jwtTokenProvider.generateToken(1L);
+
+        // 2. Act (When) & 3. Assert (Then)
+        mockMvc.perform(post("/api/v1/wallets")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"walletName\": "))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.code").value(500))
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
 }

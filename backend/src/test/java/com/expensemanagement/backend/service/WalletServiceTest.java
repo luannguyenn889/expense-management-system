@@ -708,6 +708,28 @@ class WalletServiceTest {
         assertThat(response.getBalance()).isEqualByComparingTo("1500.50");
     }
 
+    @Test
+    @DisplayName("Tạo ví trùng tên không phân biệt hoa/thường -> Ném DuplicateResourceException (409)")
+    void createWallet_withCaseInsensitiveDuplicateName_shouldThrowDuplicateResourceException() {
+        // 1. Arrange (Given)
+        Long userId = 1L;
+        WalletCreateRequest request = WalletCreateRequest.builder()
+                .walletName("ví tiền mặt")
+                .walletType("cash")
+                .balance(BigDecimal.ZERO)
+                .build();
+
+        when(walletRepository.existsByUserIdAndWalletNameIgnoreCaseAndWalletType(userId, "ví tiền mặt", "CASH"))
+                .thenReturn(true);
+
+        // 2. Act (When) & 3. Assert (Then)
+        assertThatThrownBy(() -> walletService.createWallet(userId, request))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("Ví có cùng tên và loại đã tồn tại trong tài khoản của bạn");
+
+        verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
     // =========================================================================
     // US5 [CNTT46-41]: UNIT TEST CHO CHỨC NĂNG XEM DANH SÁCH VÍ
     // =========================================================================

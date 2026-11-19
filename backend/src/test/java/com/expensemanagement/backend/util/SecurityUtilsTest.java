@@ -71,4 +71,20 @@ class SecurityUtilsTest {
         );
         assertThat(SecurityUtils.getCurrentUserId()).isNull();
     }
+
+    @Test
+    @DisplayName("getCurrentUserId khi Authentication có isAuthenticated = false -> Trả về null")
+    void getCurrentUserId_whenAuthenticationIsNotAuthenticated_shouldReturnNull() {
+        // 1. Arrange (Given)
+        UsernamePasswordAuthenticationToken unauthenticatedAuth =
+                new UsernamePasswordAuthenticationToken(15L, null);
+        unauthenticatedAuth.setAuthenticated(false);
+        SecurityContextHolder.getContext().setAuthentication(unauthenticatedAuth);
+
+        // 2. Act (When)
+        Long userId = SecurityUtils.getCurrentUserId();
+
+        // 3. Assert (Then)
+        assertThat(userId).isNull();
+    }
 }

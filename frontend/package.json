@@ -11,8 +11,8 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "cypress:run:all": "cypress run",
-    "cypress:run:register": "cypress run --spec cypress/e2e/register-35-cases.cy.ts",
-    "cypress:run:login": "cypress run --spec cypress/e2e/login-14-cases.cy.ts",
+    "cypress:run:register": "cypress run --spec cypress/e2e/register-14-cases.cy.ts",
+    "cypress:run:login": "cypress run --spec cypress/e2e/login-8-cases.cy.ts",
     "cypress:run:google": "cypress run --spec cypress/e2e/google-login.cy.ts",
     "cypress:run:wallet-create": "cypress run --spec cypress/e2e/wallet-create-25-cases.cy.ts",
     "cypress:run:wallet-list": "cypress run --spec cypress/e2e/wallet-list-21-cases.cy.ts"

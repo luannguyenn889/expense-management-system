@@ -291,4 +291,211 @@ class UserServiceTest {
                 .isInstanceOf(ResourceNotFoundException.class);
         verify(userRepository, never()).deleteById(anyLong());
     }
+
+    // =========================================================================
+    // US1 [CNTT46-37]: BỔ SUNG UNIT TEST BIÊN & QUẢN LÝ USER
+    // =========================================================================
+
+    @Test
+    @DisplayName("CNTT46-37: Đăng ký khi confirmPassword là null (Frontend đã kiểm tra) -> Vẫn đăng ký thành công")
+    void register_withNullConfirmPassword_shouldSucceed() {
+        // 1. Arrange (Given)
+        UserCreationRequest request = UserCreationRequest.builder()
+                .username("feuser")
+                .fullName("Frontend User")
+                .email("feuser@example.com")
+                .password("Password123@")
+                .confirmPassword(null)
+                .build();
+
+        User savedUser = User.builder()
+                .userId(10L)
+                .username("feuser")
+                .fullName("Frontend User")
+                .email("feuser@example.com")
+                .passwordHash("$2a$10$encoded")
+                .build();
+
+        when(userRepository.existsByUsername("feuser")).thenReturn(false);
+        when(userRepository.existsByEmail("feuser@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("Password123@")).thenReturn("$2a$10$encoded");
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        // 2. Act (When)
+        UserResponse response = userService.register(request);
+
+        // 3. Assert (Then)
+        assertThat(response).isNotNull();
+        assertThat(response.getUserId()).isEqualTo(10L);
+        assertThat(response.getUsername()).isEqualTo("feuser");
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("CNTT46-37: Đăng ký với username chứa chữ hoa và khoảng trắng -> Chuẩn hóa trim + lowercase trước khi kiểm tra trùng")
+    void register_withUppercaseAndSpacesInUsername_shouldNormalizeBeforeCheckAndSave() {
+        // 1. Arrange (Given)
+        UserCreationRequest request = UserCreationRequest.builder()
+                .username("   TranMinhVuong   ")
+                .fullName("Trần Minh Vương")
+                .email("vuong@example.com")
+                .password("Password123@")
+                .confirmPassword("Password123@")
+                .build();
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        User savedUser = User.builder()
+                .userId(11L)
+                .username("tranminhvuong")
+                .fullName("Trần Minh Vương")
+                .email("vuong@example.com")
+                .passwordHash("$2a$10$encoded")
+                .build();
+
+        when(userRepository.existsByUsername("tranminhvuong")).thenReturn(false);
+        when(userRepository.existsByEmail("vuong@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("Password123@")).thenReturn("$2a$10$encoded");
+        when(userRepository.save(userCaptor.capture())).thenReturn(savedUser);
+
+        // 2. Act (When)
+        UserResponse response = userService.register(request);
+
+        // 3. Assert (Then)
+        assertThat(userCaptor.getValue().getUsername()).isEqualTo("tranminhvuong");
+        assertThat(response.getUsername()).isEqualTo("tranminhvuong");
+        verify(userRepository, times(1)).existsByUsername("tranminhvuong");
+    }
+
+    @Test
+    @DisplayName("CNTT46-37: Đăng ký với fullName có khoảng trắng thừa hai đầu -> Cắt khoảng trắng trước khi lưu")
+    void register_withSpacesAroundFullName_shouldTrimFullName() {
+        // 1. Arrange (Given)
+        UserCreationRequest request = UserCreationRequest.builder()
+                .username("minhvuong")
+                .fullName("   Trần Minh Vương   ")
+                .email("minhvuong@example.com")
+                .password("Password123@")
+                .confirmPassword("Password123@")
+                .build();
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        User savedUser = User.builder()
+                .userId(12L)
+                .username("minhvuong")
+                .fullName("Trần Minh Vương")
+                .email("minhvuong@example.com")
+                .passwordHash("$2a$10$encoded")
+                .build();
+
+        when(userRepository.existsByUsername("minhvuong")).thenReturn(false);
+        when(userRepository.existsByEmail("minhvuong@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("Password123@")).thenReturn("$2a$10$encoded");
+        when(userRepository.save(userCaptor.capture())).thenReturn(savedUser);
+
+        // 2. Act (When)
+        userService.register(request);
+
+        // 3. Assert (Then)
+        assertThat(userCaptor.getValue().getFullName()).isEqualTo("Trần Minh Vương");
+    }
+
+    @Test
+    @DisplayName("CNTT46-37: Ánh xạ mapToUserResponse -> Phải map đầy đủ 6 trường bao gồm createdAt và updatedAt")
+    void mapToUserResponse_shouldMapAllFieldsCorrectly() {
+        // 1. Arrange (Given)
+        LocalDateTime createdAt = LocalDateTime.of(2026, 11, 1, 10, 0);
+        LocalDateTime updatedAt = LocalDateTime.of(2026, 11, 2, 12, 30);
+        User user = User.builder()
+                .userId(50L)
+                .username("mapuser")
+                .fullName("Nguyễn Thị Ánh")
+                .email("anh@example.com")
+                .passwordHash("$2a$10$secretHash")
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .build();
+
+        // 2. Act (When)
+        UserResponse response = userService.mapToUserResponse(user);
+
+        // 3. Assert (Then)
+        assertThat(response.getUserId()).isEqualTo(50L);
+        assertThat(response.getUsername()).isEqualTo("mapuser");
+        assertThat(response.getFullName()).isEqualTo("Nguyễn Thị Ánh");
+        assertThat(response.getEmail()).isEqualTo("anh@example.com");
+        assertThat(response.getCreatedAt()).isEqualTo(createdAt);
+        assertThat(response.getUpdatedAt()).isEqualTo(updatedAt);
+    }
+
+    @Test
+    @DisplayName("CNTT46-37: Xóa người dùng khi ID tồn tại -> Gọi repository.deleteById đúng 1 lần")
+    void deleteUser_whenUserExists_shouldDeleteSuccessfully() {
+        // 1. Arrange (Given)
+        when(userRepository.existsById(5L)).thenReturn(true);
+
+        // 2. Act (When)
+        userService.deleteUser(5L);
+
+        // 3. Assert (Then)
+        verify(userRepository, times(1)).existsById(5L);
+        verify(userRepository, times(1)).deleteById(5L);
+    }
+
+    @Test
+    @DisplayName("CNTT46-37: Tìm người dùng theo email khi tồn tại -> Trả về đối tượng User")
+    void findByEmail_whenUserExists_shouldReturnUser() {
+        // 1. Arrange (Given)
+        User user = User.builder().userId(7L).email("found@example.com").username("founduser").build();
+        when(userRepository.findByEmail("found@example.com")).thenReturn(Optional.of(user));
+
+        // 2. Act (When)
+        User result = userService.findByEmail("found@example.com");
+
+        // 3. Assert (Then)
+        assertThat(result).isNotNull();
+        assertThat(result.getUserId()).isEqualTo(7L);
+        assertThat(result.getEmail()).isEqualTo("found@example.com");
+    }
+
+    @Test
+    @DisplayName("CNTT46-37: Tìm người dùng theo email khi không tồn tại -> Trả về null")
+    void findByEmail_whenUserNotExists_shouldReturnNull() {
+        // 1. Arrange (Given)
+        when(userRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+
+        // 2. Act (When)
+        User result = userService.findByEmail("missing@example.com");
+
+        // 3. Assert (Then)
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("CNTT46-37: Tìm người dùng theo username khi tồn tại -> Trả về đối tượng User")
+    void findByUsername_whenUserExists_shouldReturnUser() {
+        // 1. Arrange (Given)
+        User user = User.builder().userId(8L).username("vuongdev").email("vuongdev@example.com").build();
+        when(userRepository.findByUsername("vuongdev")).thenReturn(Optional.of(user));
+
+        // 2. Act (When)
+        User result = userService.findByUsername("vuongdev");
+
+        // 3. Assert (Then)
+        assertThat(result).isNotNull();
+        assertThat(result.getUserId()).isEqualTo(8L);
+        assertThat(result.getUsername()).isEqualTo("vuongdev");
+    }
+
+    @Test
+    @DisplayName("CNTT46-37: Tìm người dùng theo username khi không tồn tại -> Trả về null")
+    void findByUsername_whenUserNotExists_shouldReturnNull() {
+        // 1. Arrange (Given)
+        when(userRepository.findByUsername("ghost")).thenReturn(Optional.empty());
+
+        // 2. Act (When)
+        User result = userService.findByUsername("ghost");
+
+        // 3. Assert (Then)
+        assertThat(result).isNull();
+    }
 }

@@ -5,9 +5,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +21,9 @@ class WalletRepositoryTest {
 
     @Autowired
     private WalletRepository walletRepository;
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Test
     @DisplayName("existsByUserIdAndWalletNameIgnoreCaseAndWalletType khớp chính xác -> Trả về true")
@@ -151,5 +157,160 @@ class WalletRepositoryTest {
         assertThat(saved.getIsActive()).isTrue();
         assertThat(saved.getCreatedAt()).isNotNull();
         assertThat(saved.getUpdatedAt()).isNotNull();
+    }
+
+    // =========================================================================
+    // US5 [CNTT46-41]: UNIT TEST JPA QUERY DANH SÁCH VÍ
+    // =========================================================================
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: findByUserIdAndIsActiveTrueOrderByCreatedAtDesc -> Sắp xếp ví mới nhất lên đầu")
+    void findByUserIdAndIsActiveTrueOrderByCreatedAtDesc_shouldReturnNewestFirst() {
+        // 1. Arrange (Given)
+        Wallet older = walletRepository.saveAndFlush(Wallet.builder()
+                .userId(10L)
+                .walletName("Ví Cũ")
+                .walletType("CASH")
+                .balance(new BigDecimal("100000.00"))
+                .isActive(true)
+                .build());
+        Wallet newer = walletRepository.saveAndFlush(Wallet.builder()
+                .userId(10L)
+                .walletName("Ví Mới")
+                .walletType("BANK_ACCOUNT")
+                .balance(new BigDecimal("500000.00"))
+                .isActive(true)
+                .build());
+
+        // Đặt rõ created_at cách nhau 1 ngày để tránh trùng millisecond trên H2
+        entityManager.getEntityManager()
+                .createNativeQuery("UPDATE wallets SET created_at = :ts WHERE wallet_id = :id")
+                .setParameter("ts", LocalDateTime.of(2026, 11, 1, 8, 0))
+                .setParameter("id", older.getWalletId())
+                .executeUpdate();
+        entityManager.getEntityManager()
+                .createNativeQuery("UPDATE wallets SET created_at = :ts WHERE wallet_id = :id")
+                .setParameter("ts", LocalDateTime.of(2026, 11, 2, 8, 0))
+                .setParameter("id", newer.getWalletId())
+                .executeUpdate();
+        entityManager.flush();
+        entityManager.clear();
+
+        // 2. Act (When)
+        List<Wallet> wallets = walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(10L);
+
+        // 3. Assert (Then)
+        assertThat(wallets).hasSize(2);
+        assertThat(wallets.get(0).getWalletName()).isEqualTo("Ví Mới");
+        assertThat(wallets.get(1).getWalletName()).isEqualTo("Ví Cũ");
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: findByUserIdAndIsActiveTrueOrderByCreatedAtDesc -> Loại bỏ các ví đã ngừng sử dụng (isActive = false)")
+    void findByUserIdAndIsActiveTrueOrderByCreatedAtDesc_shouldExcludeInactiveWallets() {
+        // 1. Arrange (Given)
+        walletRepository.saveAndFlush(Wallet.builder()
+                .userId(11L)
+                .walletName("Ví Đang Hoạt Động")
+                .walletType("CASH")
+                .balance(new BigDecimal("200000.00"))
+                .isActive(true)
+                .build());
+        walletRepository.saveAndFlush(Wallet.builder()
+                .userId(11L)
+                .walletName("Ví Đã Ngừng")
+                .walletType("MOMO")
+                .balance(new BigDecimal("50000.00"))
+                .isActive(false)
+                .build());
+
+        // 2. Act (When)
+        List<Wallet> wallets = walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(11L);
+
+        // 3. Assert (Then)
+        assertThat(wallets).hasSize(1);
+        assertThat(wallets.get(0).getWalletName()).isEqualTo("Ví Đang Hoạt Động");
+        assertThat(wallets.get(0).getIsActive()).isTrue();
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: findByUserIdAndIsActiveTrueOrderByCreatedAtDesc -> Tách biệt hoàn toàn dữ liệu theo userId")
+    void findByUserIdAndIsActiveTrueOrderByCreatedAtDesc_shouldIsolateByUserId() {
+        // 1. Arrange (Given)
+        walletRepository.saveAndFlush(Wallet.builder()
+                .userId(21L)
+                .walletName("Ví User 21")
+                .walletType("CASH")
+                .balance(new BigDecimal("300000.00"))
+                .isActive(true)
+                .build());
+        walletRepository.saveAndFlush(Wallet.builder()
+                .userId(22L)
+                .walletName("Ví User 22")
+                .walletType("BANK_ACCOUNT")
+                .balance(new BigDecimal("900000.00"))
+                .isActive(true)
+                .build());
+
+        // 2. Act (When)
+        List<Wallet> user21Wallets = walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(21L);
+
+        // 3. Assert (Then)
+        assertThat(user21Wallets).hasSize(1);
+        assertThat(user21Wallets.get(0).getUserId()).isEqualTo(21L);
+        assertThat(user21Wallets.get(0).getWalletName()).isEqualTo("Ví User 21");
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: findByUserIdAndIsActiveTrueOrderByCreatedAtDesc khi user chưa có ví -> Trả về danh sách rỗng")
+    void findByUserIdAndIsActiveTrueOrderByCreatedAtDesc_whenNoWallets_shouldReturnEmptyList() {
+        // 2. Act (When)
+        List<Wallet> wallets = walletRepository.findByUserIdAndIsActiveTrueOrderByCreatedAtDesc(999L);
+
+        // 3. Assert (Then)
+        assertThat(wallets).isNotNull().isEmpty();
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: findByUserIdAndIsActiveTrue -> Chỉ trả về các ví đang hoạt động của đúng user")
+    void findByUserIdAndIsActiveTrue_shouldReturnOnlyActiveWalletsForUser() {
+        // 1. Arrange (Given)
+        walletRepository.saveAndFlush(Wallet.builder().userId(31L).walletName("Active 1").walletType("CASH").isActive(true).build());
+        walletRepository.saveAndFlush(Wallet.builder().userId(31L).walletName("Active 2").walletType("MOMO").isActive(true).build());
+        walletRepository.saveAndFlush(Wallet.builder().userId(31L).walletName("Inactive 1").walletType("BANK_ACCOUNT").isActive(false).build());
+        walletRepository.saveAndFlush(Wallet.builder().userId(32L).walletName("Other User Active").walletType("CASH").isActive(true).build());
+
+        // 2. Act (When)
+        List<Wallet> result = walletRepository.findByUserIdAndIsActiveTrue(31L);
+
+        // 3. Assert (Then)
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(Wallet::getWalletName).containsExactlyInAnyOrder("Active 1", "Active 2");
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: findByUserId -> Trả về cả ví đang hoạt động lẫn ví đã ngừng sử dụng của user")
+    void findByUserId_shouldReturnAllWalletsIncludingInactiveForUser() {
+        // 1. Arrange (Given)
+        walletRepository.saveAndFlush(Wallet.builder().userId(41L).walletName("Ví Active").walletType("CASH").isActive(true).build());
+        walletRepository.saveAndFlush(Wallet.builder().userId(41L).walletName("Ví Inactive").walletType("MOMO").isActive(false).build());
+        walletRepository.saveAndFlush(Wallet.builder().userId(42L).walletName("Ví User Khác").walletType("CASH").isActive(true).build());
+
+        // 2. Act (When)
+        List<Wallet> result = walletRepository.findByUserId(41L);
+
+        // 3. Assert (Then)
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(Wallet::getWalletName).containsExactlyInAnyOrder("Ví Active", "Ví Inactive");
+    }
+
+    @Test
+    @DisplayName("US5 [CNTT46-41]: findByUserId khi user không có ví nào -> Trả về danh sách rỗng")
+    void findByUserId_whenUserHasNoWallets_shouldReturnEmptyList() {
+        // 2. Act (When)
+        List<Wallet> result = walletRepository.findByUserId(888L);
+
+        // 3. Assert (Then)
+        assertThat(result).isNotNull().isEmpty();
     }
 }

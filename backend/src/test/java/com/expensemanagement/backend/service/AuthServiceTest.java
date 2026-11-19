@@ -9,6 +9,10 @@ import com.expensemanagement.backend.repository.UserRepository;
 import com.expensemanagement.backend.util.GoogleAuthVerifier;
 import com.expensemanagement.backend.util.JwtTokenProvider;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +22,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,6 +44,7 @@ class AuthServiceTest {
 
     private JwtTokenProvider jwtTokenProvider;
     private AuthService authService;
+    private Validator validator;
 
     private final String secretKey = "testSecretKeyForJwtSigningMustBeAtLeast32BytesLong!";
     private final long expirationTime = 86400000L;
@@ -46,6 +53,8 @@ class AuthServiceTest {
     void setUp() {
         jwtTokenProvider = new JwtTokenProvider(secretKey, expirationTime);
         authService = new AuthService(userRepository, passwordEncoder, jwtTokenProvider, googleAuthVerifier, expirationTime);
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     @Test
@@ -292,5 +301,442 @@ class AuthServiceTest {
 
         verify(googleAuthVerifier, times(1)).verify(invalidToken);
         verify(userRepository, never()).findByEmail(anyString());
+    }
+
+    // =========================================================================
+    // NHÓM 1: BỔ SUNG UNIT TEST ĐĂNG NHẬP BẰNG MẬT KHẨU (login)
+    // =========================================================================
+
+    @Test
+    @DisplayName("Đăng nhập bằng trường usernameOrEmail -> Lấy đúng identifier và trả về Token")
+    void login_withUsernameOrEmailField_shouldReturnToken() {
+        // 1. Arrange (Given)
+        String identifier = "nguyenvana@example.com";
+        String rawPassword = "Password123@";
+        String encodedHash = "$2a$10$hashedPasswordValue";
+
+        User mockUser = User.builder()
+                .userId(1L)
+                .username("nguyenvana")
+                .fullName("Nguyen Van A")
+                .email(identifier)
+                .passwordHash(encodedHash)
+                .build();
+
+        LoginRequest request = LoginRequest.builder()
+                .usernameOrEmail(identifier)
+                .password(rawPassword)
+                .build();
+
+        when(userRepository.findByEmailOrUsername(identifier, identifier)).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(rawPassword, encodedHash)).thenReturn(true);
+
+        // 2. Act (When)
+        LoginResponse response = authService.login(request);
+
+        // 3. Assert (Then)
+        assertThat(response).isNotNull();
+        assertThat(response.getAccessToken()).isNotBlank();
+        assertThat(response.getUser().getEmail()).isEqualTo(identifier);
+        verify(userRepository, times(1)).findByEmailOrUsername(identifier, identifier);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập với identifier chứa khoảng trắng và chữ hoa -> Tự động trim và lowercase")
+    void login_withIdentifierSpacesAndUppercase_shouldTrimAndLowercase() {
+        // 1. Arrange (Given)
+        String rawInput = "  USER@Example.COM  ";
+        String normalized = "user@example.com";
+        String rawPassword = "Password123@";
+        String encodedHash = "$2a$10$hashedPasswordValue";
+
+        User mockUser = User.builder()
+                .userId(2L)
+                .username("user")
+                .fullName("User Example")
+                .email(normalized)
+                .passwordHash(encodedHash)
+                .build();
+
+        LoginRequest request = LoginRequest.builder()
+                .email(rawInput)
+                .password(rawPassword)
+                .build();
+
+        when(userRepository.findByEmailOrUsername(normalized, normalized)).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(rawPassword, encodedHash)).thenReturn(true);
+
+        // 2. Act (When)
+        LoginResponse response = authService.login(request);
+
+        // 3. Assert (Then)
+        assertThat(response).isNotNull();
+        assertThat(response.getUser().getEmail()).isEqualTo(normalized);
+        verify(userRepository, times(1)).findByEmailOrUsername(normalized, normalized);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập khi identifier null hoặc toàn khoảng trắng -> Ném UnauthorizedException và không gọi DB")
+    void login_withNullOrBlankIdentifier_shouldThrowUnauthorizedException() {
+        // 1. Arrange (Given)
+        LoginRequest request = LoginRequest.builder()
+                .username("   ")
+                .email(null)
+                .usernameOrEmail("")
+                .password("Password123@")
+                .build();
+
+        // 2. Act (When) & 3. Assert (Then)
+        assertThatThrownBy(() -> authService.login(request))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("Email hoặc mật khẩu không chính xác");
+
+        verifyNoInteractions(userRepository);
+        verifyNoInteractions(passwordEncoder);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập thành công -> Trả về expiresIn tính theo giây và tokenType là Bearer")
+    void login_shouldReturnCorrectExpiresInSecondsAndBearerType() {
+        // 1. Arrange (Given)
+        String email = "time@example.com";
+        String rawPassword = "Password123@";
+        String encodedHash = "$2a$10$hashedPasswordValue";
+
+        User mockUser = User.builder()
+                .userId(3L)
+                .username("timeuser")
+                .email(email)
+                .passwordHash(encodedHash)
+                .build();
+
+        LoginRequest request = LoginRequest.builder()
+                .email(email)
+                .password(rawPassword)
+                .build();
+
+        when(userRepository.findByEmailOrUsername(email, email)).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(rawPassword, encodedHash)).thenReturn(true);
+
+        // 2. Act (When)
+        LoginResponse response = authService.login(request);
+
+        // 3. Assert (Then)
+        assertThat(response.getTokenType()).isEqualTo("Bearer");
+        assertThat(response.getExpiresIn()).isEqualTo(expirationTime / 1000);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập thành công -> Map đầy đủ các trường thông tin UserResponse")
+    void login_shouldMapUserResponseFieldsCorrectly() {
+        // 1. Arrange (Given)
+        LocalDateTime created = LocalDateTime.of(2026, 1, 1, 10, 0);
+        LocalDateTime updated = LocalDateTime.of(2026, 1, 2, 12, 30);
+        String email = "full@example.com";
+        String rawPassword = "Password123@";
+        String encodedHash = "$2a$10$hashed";
+
+        User mockUser = User.builder()
+                .userId(5L)
+                .username("fulluser")
+                .fullName("Full Name")
+                .email(email)
+                .passwordHash(encodedHash)
+                .createdAt(created)
+                .updatedAt(updated)
+                .build();
+
+        LoginRequest request = LoginRequest.builder()
+                .email(email)
+                .password(rawPassword)
+                .build();
+
+        when(userRepository.findByEmailOrUsername(email, email)).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(rawPassword, encodedHash)).thenReturn(true);
+
+        // 2. Act (When)
+        LoginResponse response = authService.login(request);
+
+        // 3. Assert (Then)
+        assertThat(response.getUser().getUserId()).isEqualTo(5L);
+        assertThat(response.getUser().getUsername()).isEqualTo("fulluser");
+        assertThat(response.getUser().getFullName()).isEqualTo("Full Name");
+        assertThat(response.getUser().getEmail()).isEqualTo(email);
+        assertThat(response.getUser().getCreatedAt()).isEqualTo(created);
+        assertThat(response.getUser().getUpdatedAt()).isEqualTo(updated);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập thất bại khi sai mật khẩu với tài khoản Google -> Ném UnauthorizedException")
+    void login_whenAccountCreatedByGoogleWithWrongManualPassword_shouldThrowUnauthorizedException() {
+        // 1. Arrange (Given)
+        String email = "googleonly@gmail.com";
+        String wrongPassword = "AnyPassword123";
+        String randomGoogleHash = "$2a$10$randomUuidHash";
+
+        User googleUser = User.builder()
+                .userId(6L)
+                .username("googleonly")
+                .email(email)
+                .passwordHash(randomGoogleHash)
+                .build();
+
+        LoginRequest request = LoginRequest.builder()
+                .email(email)
+                .password(wrongPassword)
+                .build();
+
+        when(userRepository.findByEmailOrUsername(email, email)).thenReturn(Optional.of(googleUser));
+        when(passwordEncoder.matches(wrongPassword, randomGoogleHash)).thenReturn(false);
+
+        // 2. Act (When) & 3. Assert (Then)
+        assertThatThrownBy(() -> authService.login(request))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("Email hoặc mật khẩu không chính xác");
+    }
+
+    // =========================================================================
+    // NHÓM 2: BỔ SUNG UNIT TEST ĐĂNG NHẬP BẰNG GOOGLE (loginWithGoogle)
+    // =========================================================================
+
+    @Test
+    @DisplayName("Đăng nhập Google thất bại khi payload không có email -> Ném UnauthorizedException")
+    void loginWithGoogle_whenPayloadEmailIsNullOrBlank_shouldThrowUnauthorizedException() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.token.noemail";
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail("   ");
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        GoogleLoginRequest request = GoogleLoginRequest.builder().idToken(rawGoogleToken).build();
+
+        // 2. Act (When) & 3. Assert (Then)
+        assertThatThrownBy(() -> authService.loginWithGoogle(request))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("Không thể lấy thông tin email từ Google");
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập Google với email viết hoa và khoảng trắng -> Chuẩn hóa trước khi tìm user")
+    void loginWithGoogle_whenEmailHasUppercaseAndSpaces_shouldNormalizeBeforeLookup() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.token.upper";
+        String normalizedEmail = "user.google@gmail.com";
+
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail("  User.Google@Gmail.COM ");
+        payload.set("name", "Google User");
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        User existingUser = User.builder()
+                .userId(11L)
+                .username("usergoogle")
+                .fullName("Google User")
+                .email(normalizedEmail)
+                .passwordHash("hashed")
+                .build();
+        when(userRepository.findByEmail(normalizedEmail)).thenReturn(Optional.of(existingUser));
+
+        // 2. Act (When)
+        LoginResponse response = authService.loginWithGoogle(GoogleLoginRequest.builder().idToken(rawGoogleToken).build());
+
+        // 3. Assert (Then)
+        assertThat(response.getUser().getEmail()).isEqualTo(normalizedEmail);
+        verify(userRepository, times(1)).findByEmail(normalizedEmail);
+    }
+
+    @Test
+    @DisplayName("Đăng nhập Google lần đầu khi payload thiếu name -> Lấy phần trước @ làm fullName")
+    void loginWithGoogle_whenPayloadNameIsNullOrBlank_shouldFallbackNameFromEmail() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.token.noname";
+        String email = "nonameuser@gmail.com";
+
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail(email);
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("nonameuser")).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$hash");
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.save(userCaptor.capture())).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setUserId(30L);
+            return u;
+        });
+
+        // 2. Act (When)
+        LoginResponse response = authService.loginWithGoogle(GoogleLoginRequest.builder().idToken(rawGoogleToken).build());
+
+        // 3. Assert (Then)
+        assertThat(userCaptor.getValue().getFullName()).isEqualTo("nonameuser");
+        assertThat(response.getUser().getFullName()).isEqualTo("nonameuser");
+    }
+
+    @Test
+    @DisplayName("Đăng nhập Google lần đầu với prefix email < 3 ký tự -> Tự thêm tiền tố user_")
+    void loginWithGoogle_whenEmailPrefixShorterThan3Chars_shouldAddUserPrefix() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.token.short";
+        String email = "ab@gmail.com";
+
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail(email);
+        payload.set("name", "Short Name");
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("user_ab")).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$hash");
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.save(userCaptor.capture())).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setUserId(31L);
+            return u;
+        });
+
+        // 2. Act (When)
+        authService.loginWithGoogle(GoogleLoginRequest.builder().idToken(rawGoogleToken).build());
+
+        // 3. Assert (Then)
+        assertThat(userCaptor.getValue().getUsername()).isEqualTo("user_ab");
+    }
+
+    @Test
+    @DisplayName("Đăng nhập Google lần đầu với email chứa ký tự đặc biệt -> Loại bỏ ký tự đặc biệt khỏi username")
+    void loginWithGoogle_whenEmailPrefixHasSpecialChars_shouldStripSpecialChars() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.token.special";
+        String email = "nguyen.van-a+1@gmail.com";
+
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail(email);
+        payload.set("name", "Nguyen Van A");
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("nguyenvana1")).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$hash");
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.save(userCaptor.capture())).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setUserId(32L);
+            return u;
+        });
+
+        // 2. Act (When)
+        authService.loginWithGoogle(GoogleLoginRequest.builder().idToken(rawGoogleToken).build());
+
+        // 3. Assert (Then)
+        assertThat(userCaptor.getValue().getUsername()).isEqualTo("nguyenvana1");
+    }
+
+    @Test
+    @DisplayName("Đăng nhập Google lần đầu khi username sinh ra đã tồn tại -> Gắn hậu tố ngẫu nhiên")
+    void loginWithGoogle_whenGeneratedUsernameExists_shouldAppendRandomSuffix() {
+        // 1. Arrange (Given)
+        String rawGoogleToken = "valid.token.dupuser";
+        String email = "existingname@gmail.com";
+
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail(email);
+        payload.set("name", "Existing Name");
+        when(mockIdToken.getPayload()).thenReturn(payload);
+        when(googleAuthVerifier.verify(rawGoogleToken)).thenReturn(mockIdToken);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("existingname")).thenReturn(true);
+        when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$hash");
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.save(userCaptor.capture())).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setUserId(33L);
+            return u;
+        });
+
+        // 2. Act (When)
+        authService.loginWithGoogle(GoogleLoginRequest.builder().idToken(rawGoogleToken).build());
+
+        // 3. Assert (Then)
+        String savedUsername = userCaptor.getValue().getUsername();
+        assertThat(savedUsername).startsWith("existingname_");
+        assertThat(savedUsername.length()).isEqualTo("existingname_".length() + 5);
+    }
+
+    // =========================================================================
+    // NHÓM 3: DTO VALIDATION & HELPER (LoginRequest & GoogleLoginRequest)
+    // =========================================================================
+
+    @Test
+    @DisplayName("LoginRequest.getIdentifier() ưu tiên lấy usernameOrEmail khi truyền cả 3 trường")
+    void loginRequest_getIdentifier_shouldPrioritizeUsernameOrEmailOverOthers() {
+        // 1. Arrange (Given)
+        LoginRequest request = LoginRequest.builder()
+                .usernameOrEmail("  priorityUser  ")
+                .username("secondaryUser")
+                .email("third@example.com")
+                .password("Password123@")
+                .build();
+
+        // 2. Act (When)
+        String identifier = request.getIdentifier();
+
+        // 3. Assert (Then)
+        assertThat(identifier).isEqualTo("priorityUser");
+    }
+
+    @Test
+    @DisplayName("LoginRequest với mật khẩu trống -> Bean Validation báo lỗi đúng thông điệp")
+    void loginRequest_withBlankPassword_shouldFailBeanValidation() {
+        // 1. Arrange (Given)
+        LoginRequest request = LoginRequest.builder()
+                .email("user@example.com")
+                .password("   ")
+                .build();
+
+        // 2. Act (When)
+        Set<ConstraintViolation<LoginRequest>> violations = validator.validate(request);
+
+        // 3. Assert (Then)
+        assertThat(violations).isNotEmpty();
+        assertThat(violations)
+                .extracting(ConstraintViolation::getMessage)
+                .contains("Mật khẩu không được để trống");
+    }
+
+    @Test
+    @DisplayName("GoogleLoginRequest với idToken trống -> Bean Validation báo lỗi đúng thông điệp")
+    void googleLoginRequest_withBlankIdToken_shouldFailBeanValidation() {
+        // 1. Arrange (Given)
+        GoogleLoginRequest request = GoogleLoginRequest.builder()
+                .idToken("")
+                .build();
+
+        // 2. Act (When)
+        Set<ConstraintViolation<GoogleLoginRequest>> violations = validator.validate(request);
+
+        // 3. Assert (Then)
+        assertThat(violations).isNotEmpty();
+        assertThat(violations)
+                .extracting(ConstraintViolation::getMessage)
+                .contains("ID Token của Google không được để trống");
     }
 }

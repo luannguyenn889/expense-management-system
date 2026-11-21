@@ -13,6 +13,23 @@ describe('U1.1: E2E Automation Test - 14 Test Cases Đăng Ký Tài Khoản', ()
       body: { code: 201, message: 'Đăng ký tài khoản thành công', data: { token: 'mock-token' } },
     }).as('registerSuccess');
 
+    cy.intercept('POST', '**/auth/login', {
+      statusCode: 200,
+      body: {
+        code: 200,
+        message: 'Đăng nhập thành công',
+        data: {
+          token: 'mock-jwt-token-12345',
+          user: { fullName: 'Nguyễn Văn A', username: `nguyenvana_${timestamp}` },
+        },
+      },
+    }).as('loginSuccess');
+
+    cy.intercept('GET', '**/wallets', {
+      statusCode: 200,
+      body: { code: 200, message: 'OK', data: [] },
+    }).as('getWallets');
+
     // 2. Act (When): Điền đầy đủ thông tin hợp lệ và nhấn Đăng ký
     cy.get('input[formControlName="fullName"]').type('Nguyễn Văn A');
     cy.get('input[formControlName="email"]').type(`vana_${timestamp}@gmail.com`);

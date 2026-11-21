@@ -1,10 +1,15 @@
 describe('U1.2: E2E Automation Test - 8 Test Cases Đăng Nhập Bằng Mật Khẩu', () => {
   beforeEach(() => {
+    cy.intercept('GET', '**/wallets*', {
+      statusCode: 200,
+      body: { code: 200, message: 'OK', data: [] },
+    }).as('getWalletsDashboard');
+
     // 1. Truy cập vào trang đăng nhập trước mỗi ca kiểm thử
     cy.visit('/login');
   });
 
-    // TC_U1.2_01
+  // TC_U1.2_01
   it('TC_U1.2_01_login_withValidData_shouldRedirectToDashboard', () => {
     // 1. Arrange (Given): Chuẩn bị tài khoản hợp lệ và mock API login thành công
     cy.intercept('POST', '**/auth/login', {

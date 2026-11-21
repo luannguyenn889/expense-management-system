@@ -1,22 +1,22 @@
-﻿describe('U2.2: E2E Automation Test - 10 Test Cases Xem Danh S├ích V├¡ v├á Sß╗æ D╞░', () => {
+describe('U2.2: E2E Automation Test - 10 Test Cases Xem Danh Sách Ví và Số Dư', () => {
   const mock3Wallets = [
-    { walletId: 1, walletName: 'V├¡ tiß╗ün mß║╖t', balance: 500000, walletType: 'CASH', isActive: true },
-    { walletId: 2, walletName: 'V├¡ Momo', balance: 1000000, walletType: 'MOMO', isActive: true },
-    { walletId: 3, walletName: 'V├¡ tiß║┐t kiß╗çm', balance: 2000000, walletType: 'BANK_ACCOUNT', isActive: true },
+    { walletId: 1, walletName: 'Ví tiền mặt', balance: 500000, walletType: 'CASH', isActive: true },
+    { walletId: 2, walletName: 'Ví Momo', balance: 1000000, walletType: 'MOMO', isActive: true },
+    { walletId: 3, walletName: 'Ví tiết kiệm', balance: 2000000, walletType: 'BANK_ACCOUNT', isActive: true },
   ];
 
   const setupAuth = (win: any, username = 'nguyenvana') => {
     win.sessionStorage.setItem('expense-management-token', 'mock-jwt-token-12345');
-    win.sessionStorage.setItem('expense-management-user-full-name', 'Nguyß╗àn V─ân A');
+    win.sessionStorage.setItem('expense-management-user-full-name', 'Nguyễn Văn A');
     win.sessionStorage.setItem('expense-management-username', username);
   };
 
-    // TC_U2.2_01
+  // TC_U2.2_01
   it('TC_U2.2_01_viewWallets_shouldDisplayAllUserWallets', () => {
     // 1. Arrange (Given)
     cy.intercept('GET', '**/api/v1/wallets', {
       statusCode: 200,
-      body: { code: 200, message: 'Th├ánh c├┤ng', data: mock3Wallets },
+      body: { code: 200, message: 'Thành công', data: mock3Wallets },
     }).as('get3Wallets');
 
     // 2. Act (When)
@@ -24,9 +24,9 @@
     // 3. Assert (Then)
     cy.wait('@get3Wallets');
 
-    cy.contains('V├¡ tiß╗ün mß║╖t').should('be.visible');
-    cy.contains('V├¡ Momo').should('be.visible');
-    cy.contains('V├¡ tiß║┐t kiß╗çm').should('be.visible');
+    cy.contains('Ví tiền mặt').should('be.visible');
+    cy.contains('Ví Momo').should('be.visible');
+    cy.contains('Ví tiết kiệm').should('be.visible');
   });
 
   // TC_U2.2_02
@@ -36,10 +36,10 @@
       statusCode: 200,
       body: {
         code: 200,
-        message: 'Th├ánh c├┤ng',
+        message: 'Thành công',
         data: [
-          { walletId: 1, walletName: 'V├¡ tiß╗ün mß║╖t', balance: 500000, walletType: 'CASH', isActive: true },
-          { walletId: 2, walletName: 'V├¡ Momo', balance: 1000000, walletType: 'MOMO', isActive: true },
+          { walletId: 1, walletName: 'Ví tiền mặt', balance: 500000, walletType: 'CASH', isActive: true },
+          { walletId: 2, walletName: 'Ví Momo', balance: 1000000, walletType: 'MOMO', isActive: true },
         ],
       },
     }).as('get2Wallets');
@@ -49,9 +49,9 @@
     // 3. Assert (Then)
     cy.wait('@get2Wallets');
 
-    cy.contains('V├¡ tiß╗ün mß║╖t').should('be.visible');
-    cy.contains('Tiß╗ün mß║╖t').should('be.visible');
-    cy.contains('V├¡ Momo').should('be.visible');
+    cy.contains('Ví tiền mặt').should('be.visible');
+    cy.contains('Tiền mặt').should('be.visible');
+    cy.contains('Ví Momo').should('be.visible');
     cy.contains('MoMo').should('be.visible');
   });
 
@@ -62,10 +62,10 @@
       statusCode: 200,
       body: {
         code: 200,
-        message: 'Th├ánh c├┤ng',
+        message: 'Thành công',
         data: [
-          { walletId: 1, walletName: 'V├¡ tiß╗ün mß║╖t', balance: 500000, walletType: 'CASH', isActive: true },
-          { walletId: 2, walletName: 'V├¡ Momo', balance: 1000000, walletType: 'MOMO', isActive: true },
+          { walletId: 1, walletName: 'Ví tiền mặt', balance: 500000, walletType: 'CASH', isActive: true },
+          { walletId: 2, walletName: 'Ví Momo', balance: 1000000, walletType: 'MOMO', isActive: true },
         ],
       },
     }).as('getBalances');
@@ -86,8 +86,8 @@
       statusCode: 200,
       body: {
         code: 200,
-        message: 'Th├ánh c├┤ng',
-        data: [{ walletId: 1, walletName: 'V├¡ Tiß╗ün mß║╖t A', balance: 500000, walletType: 'CASH', isActive: true }],
+        message: 'Thành công',
+        data: [{ walletId: 1, walletName: 'Ví Tiền mặt A', balance: 500000, walletType: 'CASH', isActive: true }],
       },
     }).as('getWalletsA');
 
@@ -96,8 +96,8 @@
     // 3. Assert (Then)
     cy.wait('@getWalletsA');
 
-    cy.contains('V├¡ Tiß╗ün mß║╖t A').should('be.visible');
-    cy.contains('V├¡ Momo B').should('not.exist');
+    cy.contains('Ví Tiền mặt A').should('be.visible');
+    cy.contains('Ví Momo B').should('not.exist');
   });
 
   // TC_U2.2_05
@@ -105,7 +105,7 @@
     // 1. Arrange (Given)
     cy.intercept('GET', '**/api/v1/wallets', {
       statusCode: 200,
-      body: { code: 200, message: 'Th├ánh c├┤ng', data: [] },
+      body: { code: 200, message: 'Thành công', data: [] },
     }).as('getEmptyWallets');
 
     // 2. Act (When)
@@ -113,9 +113,9 @@
     // 3. Assert (Then)
     cy.wait('@getEmptyWallets');
 
-    cy.contains('Bß║ín ch╞░a c├│ v├¡ n├áo').should('be.visible');
-    cy.contains('Tß║ío v├¡ ─æß║ºu ti├¬n ─æß╗â bß║»t ─æß║ºu quß║ún l├╜ t├ái ch├¡nh cß╗ºa m├¼nh.').should('be.visible');
-    cy.get('.balance-wallet-count').should('contain.text', '0 v├¡');
+    cy.contains('Bạn chưa có ví nào').should('be.visible');
+    cy.contains('Tạo ví đầu tiên để bắt đầu quản lý tài chính của mình.').should('be.visible');
+    cy.get('.balance-wallet-count').should('contain.text', '0 ví');
   });
 
   // TC_U2.2_06
@@ -123,7 +123,7 @@
     // 1. Arrange (Given)
     cy.intercept('GET', '**/api/v1/wallets', {
       statusCode: 200,
-      body: { code: 200, message: 'Th├ánh c├┤ng', data: mock3Wallets },
+      body: { code: 200, message: 'Thành công', data: mock3Wallets },
     }).as('getWalletsReload');
 
     // 2. Act (When)
@@ -133,7 +133,7 @@
     cy.reload();
     cy.wait('@getWalletsReload');
 
-    cy.contains('V├¡ tiß╗ün mß║╖t').should('be.visible');
+    cy.contains('Ví tiền mặt').should('be.visible');
     cy.contains('500.000').should('be.visible');
   });
 
@@ -142,7 +142,7 @@
     // 1. Arrange (Given)
     cy.intercept('GET', '**/api/v1/wallets', {
       statusCode: 200,
-      body: { code: 200, message: 'Th├ánh c├┤ng', data: mock3Wallets },
+      body: { code: 200, message: 'Thành công', data: mock3Wallets },
     }).as('get3WalletsSum');
 
     // 2. Act (When)
@@ -158,7 +158,7 @@
     // 1. Arrange (Given)
     cy.intercept('GET', '**/api/v1/wallets', {
       statusCode: 200,
-      body: { code: 200, message: 'Th├ánh c├┤ng', data: [] },
+      body: { code: 200, message: 'Thành công', data: [] },
     }).as('getZeroWallets');
 
     // 2. Act (When)
@@ -176,18 +176,18 @@
     cy.intercept('GET', '**/api/v1/wallets', (req) => {
       callCount++;
       if (callCount === 1) {
-        req.reply({ statusCode: 200, body: { code: 200, message: 'OK', data: [{ walletId: 1, walletName: 'V├¡ 1', balance: 500000, walletType: 'CASH', isActive: true }] } });
+        req.reply({ statusCode: 200, body: { code: 200, message: 'OK', data: [{ walletId: 1, walletName: 'Ví 1', balance: 500000, walletType: 'CASH', isActive: true }] } });
       } else {
         req.reply({ statusCode: 200, body: { code: 200, message: 'OK', data: [
-          { walletId: 1, walletName: 'V├¡ 1', balance: 500000, walletType: 'CASH', isActive: true },
-          { walletId: 2, walletName: 'V├¡ 2', balance: 1000000, walletType: 'MOMO', isActive: true }
+          { walletId: 1, walletName: 'Ví 1', balance: 500000, walletType: 'CASH', isActive: true },
+          { walletId: 2, walletName: 'Ví 2', balance: 1000000, walletType: 'MOMO', isActive: true }
         ] } });
       }
     }).as('getWalletsDynamic');
 
     cy.intercept('POST', '**/api/v1/wallets', {
       statusCode: 201,
-      body: { code: 201, message: 'OK', data: { walletId: 2, walletName: 'V├¡ 2', balance: 1000000, walletType: 'MOMO', isActive: true } },
+      body: { code: 201, message: 'OK', data: { walletId: 2, walletName: 'Ví 2', balance: 1000000, walletType: 'MOMO', isActive: true } },
     }).as('createWallet10');
 
     // 2. Act (When)
@@ -196,9 +196,9 @@
     cy.wait('@getWalletsDynamic');
     cy.get('.balance-banner-copy strong').should('contain.text', '500.000');
 
-    cy.get('input[formControlName="walletName"]').type('V├¡ 2');
+    cy.get('input[formControlName="walletName"]').type('Ví 2');
     cy.get('select[formControlName="walletType"]').select('MOMO');
-    cy.get('input[formControlName="balance"]').clear().type('1000000');
+    cy.get('.amount-input input').clear().type('1000000');
     cy.get('app-wallet-create-form button[type="submit"]').click();
 
     cy.wait('@createWallet10');
@@ -211,7 +211,7 @@
     // 1. Arrange (Given)
     cy.intercept('GET', '**/api/v1/wallets', {
       statusCode: 200,
-      body: { code: 200, message: 'Th├ánh c├┤ng', data: mock3Wallets },
+      body: { code: 200, message: 'Thành công', data: mock3Wallets },
     }).as('get3WalletsCount');
 
     // 2. Act (When)
@@ -220,6 +220,6 @@
     cy.wait('@get3WalletsCount');
 
     cy.get('.wallet-count').should('contain.text', '3');
-    cy.get('.balance-wallet-count').should('contain.text', '3 v├¡');
+    cy.get('.balance-wallet-count').should('contain.text', '3 ví');
   });
 });

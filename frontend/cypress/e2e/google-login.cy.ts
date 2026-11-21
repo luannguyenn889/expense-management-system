@@ -39,6 +39,15 @@ describe('U1.3: E2E Automation Test - Đăng Nhập Bằng Google', () => {
       },
     }).as('googleAuthApiFallback');
 
+    cy.intercept('GET', '**/wallets*', {
+      statusCode: 200,
+      body: {
+        code: 200,
+        message: 'Lấy danh sách ví thành công',
+        data: [],
+      },
+    }).as('getWalletsDashboard');
+
     cy.visit('/login', {
       onBeforeLoad(win: any) {
         let authCallback: any = null;
@@ -48,7 +57,13 @@ describe('U1.3: E2E Automation Test - Đăng Nhập Bằng Google', () => {
               initialize: (config: any) => {
                 authCallback = config.callback;
               },
-              prompt: () => {
+              prompt: (notificationCallback?: any) => {
+                if (typeof notificationCallback === 'function') {
+                  notificationCallback({
+                    isNotDisplayed: () => false,
+                    isSkippedMoment: () => false,
+                  });
+                }
                 setTimeout(() => {
                   if (authCallback) {
                     authCallback({
